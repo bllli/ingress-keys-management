@@ -1,9 +1,18 @@
 {% extends "base.html" %}
+{% import "_macros.html" as macros %}
 
 {% block title %}Flasky{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
+    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% endif %}!</h1>
 </div>
+<div>
+    {% include "_portals.html" %}
+</div>
+{% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, '.index') }}
+    </div>
+{% endif %}
 {% endblock %}

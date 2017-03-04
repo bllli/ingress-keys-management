@@ -1,18 +1,23 @@
-from flask import render_template, redirect, url_for, abort, flash
+from flask import render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm
 from .. import db
-from ..models import Role, User
+from ..models import Role, User, Portal
 from ..decorators import admin_required
 
 
 @main.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    page = request.args.get('page', 1, type=int)
+    pagination = Portal.query.order_by(Portal.timestamp.desc()).paginate(page, per_page=50, error_out=False)
+    portals = enumerate(pagination.items)
+    return render_template('index.html', page=page, portals=portals, pagination=pagination)
 
 
 @main.route('/user/<username>')
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('user.html', user=user)

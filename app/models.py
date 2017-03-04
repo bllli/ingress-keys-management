@@ -59,22 +59,22 @@ class Portal(db.Model):
     area = db.Column(db.String(128))
     link = db.Column(db.String(128), unique=True)
 
-    add_date = db.Column(db.DateTime, default=datetime.utcnow)
-    submitter = db.Column(db.Integer, db.ForeignKey('users.id'))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    submitter_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     keys = db.relationship('Have', backref='portal', lazy='dynamic')
 
 
 class Have(db.Model):
     __tablename__ = 'haves'
-    portal_id = db.Column(db.Integer, db.ForeignKey('portals.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    portal_id = db.Column(db.Integer, db.ForeignKey('portals.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     count = db.Column(db.Integer, default=0)
 
-    modify_date = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     @staticmethod
     def ping(target, value, oldvalue, initiator):
-        target.modify_date = datetime.utcnow()
+        target.timestamp = datetime.utcnow()
 db.event.listen(Have.count, 'set', Have.ping)
 
 
@@ -94,7 +94,7 @@ class User(UserMixin, db.Model):
     avatar_hash = db.Column(db.String(32))
 
     submit_portals = db.relationship('Portal', backref='submitter', lazy='dynamic')
-    keys_having = db.relationship('Have')
+    keys_having = db.relationship('Have', backref='haver', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -106,6 +106,16 @@ class User(UserMixin, db.Model):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
+
+    def having_key(self, po_id):
+        # return Portal.query.join(Have, Have.portal_id == Portal.id).\
+        #    filter(Have.user_id == self.id).first()
+        # Have.query.join(Portal, Portal.id == Have.portal_id).filter(Have.user_id == self.id)
+        have = Have.query.filter_by(portal_id=po_id, user_id=self.id).first()
+        if have is not None:
+            return have.count
+        else:
+            return 'n/a'
 
     @property
     def password(self):
