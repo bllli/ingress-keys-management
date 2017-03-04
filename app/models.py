@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 from datetime import datetime
 import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash

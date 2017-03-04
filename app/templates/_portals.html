@@ -1,6 +1,6 @@
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span12">
+		<div class="table-responsive">
 			<table class="table table-hover table-condensed table-striped">
 				<thead>
 					<tr>
@@ -12,14 +12,14 @@
 					</tr>
 				</thead>
 				<tbody>
-                    {% for i, portal in portals %}
-					<tr {% if i % 2 == 0 %}class="success"{% endif %}>
+                    {% for portal in portals %}
+					<tr>
 						<td>{{ portal.id }}</td>
 						<td>{{ portal.name }}</td>
 						<td>{{ portal.area }}</td>
 						<td>
                             {% if portal.link %}
-                                <a href="{{ portal.link }}" target="_blank">跳转</a>
+                                <a href="{{ portal.link }}" target="_blank">intel</a>
                             {% else %}
                                 n/a
                             {% endif %}

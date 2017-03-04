@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import os
 from app import create_app, db
 from app.models import User, Role, Permission

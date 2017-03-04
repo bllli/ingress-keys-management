@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Po信息 - {{ portals[0].name }}</h1>
+</div>
+<div>
+    {% include "_portals.html" %}
+</div>
+<div>
+    {% include "_keys.html" %}
+</div>
+{% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, 'portal.portal_info', po_id=portals[0].id) }}
+    </div>
+{% endif %}
+{% endblock %}
