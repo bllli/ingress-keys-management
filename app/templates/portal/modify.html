@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}{{ portals[0].name }} - 修改Portal信息{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    修改Portal信息 - {{ portals[0].name }}
+</div>
+<div>
+    {% include '_portals.html' %}
+</div>
+<div>
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}
