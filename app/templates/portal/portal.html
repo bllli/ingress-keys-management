@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}{{ portals[0].name }} - Portal 信息{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Po信息 - {{ portals[0].name }}</h1>
-</div>
 <div>
     {% include "_portals.html" %}
 </div>
