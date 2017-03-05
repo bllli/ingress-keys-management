@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, redirect, url_for, abort, flash, request
+from flask import render_template, redirect, url_for, abort, flash, request, jsonify
 from flask_login import login_required, current_user
 from . import portal
-from .. import db
+from .. import db, csrf
 from .forms import AddPortalForm
-from ..models import Role, User, Permission, Portal
+from ..models import Role, User, Permission, Portal, Have
 from ..decorators import permission_required, admin_required
+from flask_wtf.csrf import validate_csrf, ValidationError
 
 
 @portal.route('/<po_id>')
+@login_required
 def portal_info(po_id):
     po = Portal.query.get_or_404(po_id)
     page = request.args.get('page', 1, type=int)
@@ -18,6 +20,7 @@ def portal_info(po_id):
 
 
 @portal.route('/add', methods=['POST', 'GET'])
+@login_required
 @permission_required(Permission.ADD_PORTAL)
 def add():
     form = AddPortalForm()
@@ -39,6 +42,7 @@ def add():
 
 @portal.route('/modify/<po_id>', methods=['GET', 'POST'])
 # @permission_required(Permission.MODIFY_PORTAL)
+@login_required
 def modify(po_id):
     po = Portal.query.get_or_404(po_id)
     if current_user.can(Permission.MODIFY_PORTAL) or po.submitter_id == current_user.id:
@@ -58,11 +62,45 @@ def modify(po_id):
         return redirect(url_for('portal.portal_info', po_id=po_id))
 
 
-@portal.route('/change_amount/<po_id>')
-def change_amount(po_id):
-    pass
+@portal.route('/change_count', methods=['POST'])
+@csrf.exempt
+def change_count():
+    # 如果用户未登录，返回相关信息给AJAX，手动处理重定向。
+    # 如果交给@login_required自动重定向的话，
+    # AJAX不能正确处理这个重定向
+    if not current_user.is_authenticated:
+        return jsonify({
+            'status': 302,
+            'location': url_for(
+                'auth.login',
+                next=request.referrer.replace(
+                    url_for('.index', _external=True)[:-1], ''))
+        })
+    # 以post方式传的数据在存储在的request.form中，以get方式传输的在request.args中~~
+    # 同理，csrf token认证也要手动解决重定向
+    try:
+        validate_csrf(request.headers.get('X-CSRFToken'))
+    except ValidationError:
+        return jsonify({
+            'status': 400,
+            'location': url_for(
+                'auth.login',
+                next=request.referrer.replace(
+                    url_for('.index', _external=True)[:-1], ''))
+        })
+    po_id = int(request.form.get('po_id'))
+    count = int(request.form.get('count'))
+    ha = Have.query.filter_by(portal_id=po_id,
+                              user_id=current_user.id).first()
+    if ha is not None:
+        ha.count = count
+    else:
+        ha = Have(portal_id=po_id, user_id=current_user.id, count=count)
+    db.session.add(ha)
+    return 'ok'
 
 
 @portal.route('/submit_by/<username>')
+@login_required
 def submit_by(username):
     pass

@@ -25,6 +25,10 @@
                             {% endif %}
                         </td>
                         <td>{{ current_user.having_key(portal.id) }}</td>
+                        <td>
+                            <input type="number" value="{{ current_user.having_key(portal.id) }}" class="count" about="{{ portal.id }}">
+                            <button class="change-count" about="{{ portal.id }}" >提交</button>
+                        </td>
 					</tr>
                     {% endfor %}
 				</tbody>

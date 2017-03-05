@@ -66,4 +66,49 @@
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
+    <script type="text/javascript">
+    /*var mbox = new extendBoot.Mesbox({
+    title:"模拟alert",
+    type:"alert",
+    getContent:"模拟alert-单纯信息展示，点击确认，则关闭该alert",
+    applyName:"确定"
+    });*/
+    $(function(){
+    $('.change-count').click(function(){
+        var csrf_token = "{{ csrf_token() }}";
+        var changeBtn = $(this);
+        var po_id = changeBtn.attr('about');
+        var inputCount = $('.count[about="'+po_id+'"]');
+        var data = {
+            'po_id': changeBtn.attr('about'),
+            'count': inputCount.prop('value')
+        };
+        //changeBtn.text('点了');
+        //inputCount.val('999');
+        //alert('count'+inputCount.prop('value'));
+        if (inputCount.prop('value') < 0){
+            alert('key数量不能小于0~');
+        }else {
+            $.ajax({
+                beforeSend: function (xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                },
+                type: 'POST',
+                url: '{{ url_for('portal.change_count') }}',
+                data: data,  // 这个data是要post的数据
+                success: function (data) {  // 这个data是接收到的响应的实体
+                    if (data == 'ok') {
+                        alert('数量修改成功');  // 这里可以用模态框，会好看点~~懒得弄了
+                        // mbox.show()
+                    } else if (data.status == 302) {
+                        location.href = data.location;
+                    }
+                }
+            });
+        }
+    });
+    });
+</script>
 {% endblock %}
