@@ -89,6 +89,8 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
 
+    wechat_id = db.Column(db.String(128))
+
     submit_portals = db.relationship('Portal', backref='submitter', lazy='dynamic')
     keys_having = db.relationship('Have', backref='haver', lazy='dynamic')
 
