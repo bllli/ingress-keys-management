@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from .. import db
-from ..models import User
-from flask_login import login_user
+from ..models import User, Portal
+from flask_login import login_user, current_user
 
 
 def dosomething(source, content):
@@ -54,7 +54,16 @@ def dosomething(source, content):
     elif content[:len(u"key")] == u"key":
         pass
     elif content[:len(u"po")] == u"po":
-        pass
+        prep = content.split(' ')
+        try:
+            po_id = prep[1]
+        except IndexError:
+            return '查看po信息: "po <po编号>"'
+        po = Portal.query.filter_by(po_id).first()
+        if po is None:
+            return '查看po信息: "po <po编号>"'
+        return '%d, %s, intel:%s, key:%d' % (po.id, po.name, po.link, current_user.having_key(po.id))
+
     return '蛤?\n' \
            '命令如下:\n' \
            '查看portal列表: "list"\n' \

@@ -39,4 +39,7 @@ def create_app(config_name):
     from .portal import portal as portal_blueprint
     app.register_blueprint(portal_blueprint, url_prefix='/portal')
 
+    from .wechat import keybot as wechat_blueprint
+    app.register_blueprint(wechat_blueprint, url_prefix='/wechat')
+
     return app

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from wechat_sdk import WechatConf
 from wechat_sdk import WechatBasic
 from wechat_sdk.messages import *
@@ -7,17 +8,17 @@ from flask import template_rendered, redirect, request, url_for
 
 
 conf = WechatConf(
-    token='your token',
-    appid='your appid',
-    appsecret='your appsecret',
-    encrypt_mode='your mode',  # 可选项：normal/compatible/safe，分别对应于 明文/兼容/安全 模式
-    encoding_aes_key='your aes key'  # 如果传入此值则必须保证同时传入 token, appid
+    token=os.environ.get('WECHAT_TOKEN') or 'your token',
+    appid=os.environ.get('WECHAT_APPID') or 'your appid',
+    appsecret=os.environ.get('WECHAT_APPSECRET') or 'your appsecret',
+    encrypt_mode=os.environ.get('ENCRYPT_MODE') or 'your mode',  # 可选项：normal/compatible/safe，分别对应于 明文/兼容/安全 模式
+    encoding_aes_key=os.environ.get('ENCODING_AES_KEY') or 'your aes key'  # 如果传入此值则必须保证同时传入 token, appid
 )
 
 wechat = WechatBasic(conf=conf)
 
 from . import keybot
-from .doSometing import dosomething
+from .doSomething import dosomething
 from ..models import User
 from flask_login import login_user
 # from pymysql.err import OperationalError
@@ -67,4 +68,4 @@ def interface():
                                                         '(大小写不敏感)')
             return wechat.response_text(content='这位特工我跟你讲,你发的是啥我看不懂!\n')
         else:
-            return 'Sometimes naive.', 500
+            return 'Sometimes naive.', 5000
