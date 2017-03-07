@@ -1,7 +1,3 @@
-{% for po in portals %}
-ID: {{ po.id }}, {{ po.name }}{% if po.area %}@{{ po.area }}{% endif %}{% if po.link %}, {{ po.link }}{% endif %}
-{% if current_user.having_key(po.id) != 'n/a' %}, 你有{{ current_user.having_key(po.id) }}个key{% endif %}
-\n{% endfor %}
-{% if pagination %}
-第 {{ pagination.page }}/{{ pagination.pages }}页
-{% endif %}
+{% for po in portals %}ID: {{ po.id }}, {{ po.name }}{% if po.area %}@{{ po.area }}{% endif %}{% if po.link %}, {{ po.link }}{% endif %}{% if current_user.having_key(po.id) != 'n/a' %}, 你有{{ current_user.having_key(po.id) }}个key{% endif %}
+{% endfor %}
+{% if pagination %}第 {{ pagination.page }}/{{ pagination.pages }}页{% endif %}
