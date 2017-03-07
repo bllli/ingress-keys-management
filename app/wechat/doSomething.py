@@ -51,7 +51,17 @@ def dosomething(source, content):
     else:  # 认证了给个登录
         login_user(user, False)
     if content[:len(u"list")] == u"list":
-        pass
+        prep = content.split(' ')
+        try:
+            page = int(prep[1])
+        except IndexError:
+            page = 1
+        except ValueError:
+            return '查看po列表: "list <页数>"\n' \
+                   '页数请输入数字'
+        pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
+        portals = pagination.items
+        return render_template('wechat/po.txt', pagination=pagination, portals=portals)
     elif content[:len(u"key")] == u"key":
         pass
     elif content[:len(u"po")] == u"po":
@@ -65,7 +75,7 @@ def dosomething(source, content):
         if po is None:
             return '没找到编号对应的po\n' \
                    '请试试"list"查看po列表'
-        return render_template("wechat/po.txt", po=po)
+        return render_template("wechat/po.txt", portals=[po])
 
     return '蛤?\n' \
            '命令如下:\n' \
