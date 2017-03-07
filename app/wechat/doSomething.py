@@ -59,10 +59,10 @@ def dosomething(source, content):
             po_id = prep[1]
         except IndexError:
             return '查看po信息: "po <po编号>"'
-        po = Portal.query.filter_by(po_id).first()
+        po = Portal.query.filter_by(id=po_id).first()
         if po is None:
             return '查看po信息: "po <po编号>"'
-        return '%d, %s, intel:%s, key:%d' % (po.id, po.name, po.link, current_user.having_key(po.id))
+        return '%d, %s, intel:%s, key:%s' % (po.id, po.name, po.link, current_user.having_key(po.id))
 
     return '蛤?\n' \
            '命令如下:\n' \
