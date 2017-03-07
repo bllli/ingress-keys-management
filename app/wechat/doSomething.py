@@ -38,7 +38,7 @@ def dosomething(source, content):
                 return 'Agent code设置完成。\n' \
                        '请联系管理员获取操作权限\n' \
                        '命令如下:\n' \
-                       '查看portal列表: "list"\n' \
+                       '查看portal列表: "list"或"list <页数>"\n' \
                        '查看po信息: "po <po编号>"\n' \
                        '更改指定po的key数: "key <po编号> <key数量>"'
 
@@ -59,8 +59,14 @@ def dosomething(source, content):
         except ValueError:
             return '查看po列表: "list <页数>"\n' \
                    '页数请输入数字'
+        if page <= 0:
+            page = 1
         pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
         portals = pagination.items
+        if portals is None:
+            page = pagination.pages
+            pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
+            portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
     elif content[:len(u"key")] == u"key":
         pass
