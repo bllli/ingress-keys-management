@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .. import db
-from ..models import User, Portal
+from ..models import User, Portal, Have
 from flask import render_template
 from flask_login import login_user, current_user
 
@@ -40,7 +40,7 @@ def dosomething(source, content):
                        '命令如下:\n' \
                        '查看portal列表: "list"或"list <页数>"\n' \
                        '查看po信息: "po <po编号>"\n' \
-                       '更改指定po的key数: "key <po编号> <key数量>"'
+                       '更改指定po你拥有的key数: "key <po编号> <key数量>"'
 
     # 拦截未设置昵称的和未通过验证的用户的请求
     user = User.query.filter_by(wechat_id=source).first()
@@ -69,7 +69,29 @@ def dosomething(source, content):
             portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
     elif content[:len(u"key")] == u"key":
-        pass
+        prep = content.split(' ')
+        try:
+            po_id = prep[1]
+            count = int(prep[2])
+        except IndexError:
+            return '更改指定po你拥有的key数: "key <po编号> <key数量>"'
+        except ValueError:
+            return '数量应为数字'
+        if count < 0:
+            return '数量应大于0'
+        po = Portal.query.filter_by(id=po_id).first()
+        if po is not None:
+            ha = Have.query.filter_by(portal_id=po_id,
+                                      user_id=current_user.id).first()
+            if ha is not None:
+                ha.count = count
+            else:
+                ha = Have(portal_id=po_id, user_id=current_user.id, count=count)
+            db.session.add(ha)
+            db.session.commit()
+            return render_template('wechat/po.txt', portals=[po])
+        else:
+            return 'po编号错误!'
     elif content[:len(u"po")] == u"po":
         prep = content.split(' ')
         try:
@@ -87,4 +109,4 @@ def dosomething(source, content):
            '命令如下:\n' \
            '查看portal列表: "list"\n' \
            '查看po信息: "po <po编号>"\n' \
-           '更改指定po的key数: "key <po编号> <key数量>"'
+           '更改指定po你拥有的key数: "key <po编号> <key数量>"'
