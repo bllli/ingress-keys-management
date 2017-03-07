@@ -1,0 +1,2 @@
+ID: {{ po.id }}, {{ po.name }}{% if po.area %}@{{ po.area }}{% endif %}{% if po.link %}, {{ po.link }}{% endif %}
+{% if current_user.having_key(po.id) != 'n/a' %}\n这个po你有{{ current_user.having_key(po.id) }}个key{% endif %}

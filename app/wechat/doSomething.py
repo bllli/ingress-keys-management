@@ -2,6 +2,7 @@
 
 from .. import db
 from ..models import User, Portal
+from flask import render_template
 from flask_login import login_user, current_user
 
 
@@ -58,11 +59,13 @@ def dosomething(source, content):
         try:
             po_id = prep[1]
         except IndexError:
-            return '查看po信息: "po <po编号>"'
+            return '查看po信息: "po <po编号>"\n' \
+                   '没找到po编号'
         po = Portal.query.filter_by(id=po_id).first()
         if po is None:
-            return '查看po信息: "po <po编号>"'
-        return '%d, %s, intel:%s, key:%s' % (po.id, po.name, po.link, current_user.having_key(po.id))
+            return '没找到编号对应的po\n' \
+                   '请试试"list"查看po列表'
+        return render_template("wechat/po.txt", po=po)
 
     return '蛤?\n' \
            '命令如下:\n' \
