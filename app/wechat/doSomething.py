@@ -63,7 +63,7 @@ def dosomething(source, content):
             page = 1
         pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
         portals = pagination.items
-        if portals is None:
+        if len(portals) == 0:
             page = pagination.pages
             pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
             portals = pagination.items
