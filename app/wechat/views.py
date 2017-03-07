@@ -68,4 +68,4 @@ def interface():
                                                         '(大小写不敏感)')
             return wechat.response_text(content='这位特工我跟你讲,你发的是啥我看不懂!\n')
         else:
-            return 'Sometimes naive.', 5000
+            return 'Sometimes naive.', 500

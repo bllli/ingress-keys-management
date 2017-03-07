@@ -34,6 +34,7 @@ def add():
         po = Portal(name=form.name.data, area=form.area.data,
                     link=form.link.data, submitter_id=current_user.id)
         db.session.add(po)
+        db.session.commit()
         flash('添加成功, Thank you~<a href="%s">点击查看新添加的po</a>'
               % url_for('portal.portal_info', po_id=po.id, _external=True))
         return redirect(url_for('portal.add'))
