@@ -5,6 +5,7 @@ from wechat_sdk import WechatBasic
 from wechat_sdk.messages import *
 from wechat_sdk.exceptions import ParseError
 from flask import template_rendered, redirect, request, url_for
+from .. import csrf
 
 
 conf = WechatConf(
@@ -25,6 +26,7 @@ from flask_login import login_user
 
 
 @keybot.route('/interface', methods=['POST', 'GET'])
+@csrf.exempt
 def interface():
     if request.method == 'GET':
         items = request.args.items()
