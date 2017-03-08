@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}全部PO{% endblock %}
+
+{% block page_content %}
+<div>
+    {% include "_portals.html" %}
+</div>
+{% if pagination %}
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, 'portal.all_portal') }}
+    </div>
+{% endif %}
+{% endblock %}

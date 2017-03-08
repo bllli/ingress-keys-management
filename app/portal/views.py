@@ -63,6 +63,14 @@ def modify(po_id):
         return redirect(url_for('portal.portal_info', po_id=po_id))
 
 
+@portal.route('/all')
+@permission_required(Permission.VIEW_AGENTS)
+def all_portal():
+    portals = Portal.query.order_by(Portal.id.asc()).all()
+    agents = User.query.order_by(User.last_seen.desc()).all()
+    return render_template('portal/all.html', portals=portals, agents=agents)
+
+
 @portal.route('/change_count', methods=['POST'])
 @csrf.exempt
 def change_count():
