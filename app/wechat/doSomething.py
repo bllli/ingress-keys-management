@@ -103,7 +103,7 @@ def dosomething(source, content):
         if po is None:
             return '没找到编号对应的po\n' \
                    '请试试"list"查看po列表'
-        return render_template("wechat/po.txt", portals=[po])
+        return render_template("wechat/po.txt", portals=[po], need_link=True)
 
     return '蛤?\n' \
            '命令如下:\n' \
