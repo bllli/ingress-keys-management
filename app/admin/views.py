@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, redirect, url_for, abort, flash, request, jsonify
 from flask_login import login_required, current_user
+from . import admin
 from .. import db
 from ..models import Role, User, Permission, Portal, Have
 from ..decorators import permission_required, admin_required
-
-from . import admin
 
 
 @admin.route('/')
 @login_required
 @admin_required
-def admin():
+def index():
     pass
 
 
