@@ -7,6 +7,9 @@
 <div>
     {% include "_portals.html" %}
 </div>
+{% if current_user.can(Permission.MODIFY_PORTAL) %}
+<button><a href="{{ url_for('portal.modify', po_id=portals[0].id) }}">修改Portal信息</a></button>
+{% endif %}
 <div>
     {% include "_keys.html" %}
 </div>

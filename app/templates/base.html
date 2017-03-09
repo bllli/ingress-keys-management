@@ -26,6 +26,9 @@
                 <li><a href="{{ url_for('main.index') }}">Home</a></li>
                 {% if current_user.is_authenticated %}
                 <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
+                {% if current_user.can(Permission.ADD_PORTAL) %}
+                <li><a href="{{ url_for('portal.add', _external=True) }}">提交Portal</a></li>
+                {% endif %}
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
