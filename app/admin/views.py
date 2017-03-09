@@ -2,6 +2,7 @@
 from flask import render_template, redirect, url_for, abort, flash, request, jsonify
 from flask_login import login_required, current_user
 from . import admin
+from .forms import PortalCSVForm
 from .. import db
 from ..models import Role, User, Permission, Portal, Have
 from ..decorators import permission_required, admin_required
@@ -21,11 +22,50 @@ def agent_manage():
     pass
 
 
-@admin.route('/insert_portals')
+@admin.route('/insert_portals', methods=['POST', 'GET'])
 @login_required
 @admin_required
 def insert_portals():
-    pass
+    form = PortalCSVForm()
+    if form.validate_on_submit():
+        text = form.text.data
+        # https://www.ingress.com/intel?ll=39.089453,117.178838&z=17&pll=39.089453,117.178838
+        import re
+        p = re.compile(u'https://(www\.|)ingress\.com/intel\?ll=(\d+\.\d+),(\d+\.\d+)&z=\d+&pll=(\d+\.\d+),(\d+\.\d+)')
+        portals = []
+        with open('temp.csv', 'wb+') as f:
+            f.write(text.encode('utf-8'))
+        with open('temp.csv', 'r') as f:
+            import csv
+            cf = csv.reader(f)
+            for row in cf:
+                try:
+                    name = row[1]
+                    area = row[2]
+                    link = row[3]
+                except IndexError:
+                    print(row)
+                    flash('格式有误!导入失败!')
+                    return redirect(url_for('admin.insert_portals'))
+                portals.append([name, area, link])
+        for portal in portals:
+            name = u'%s' % portal[0]
+            area = u'%s' % portal[1]
+            link = u'%s' % portal[2]
+            m = p.match(link)
+            if m is None:
+                link = None
+            old_po = Portal.query.filter_by(link=link).first()
+            if old_po:
+                if old_po.name == name:
+                    continue
+                else:
+                    link = None
+            po = Portal(name=name, area=area, link=link)
+            db.session.add(po)
+        flash('导入成功!')
+        return redirect(url_for('main.index'))
+    return render_template('admin/insert_portals.html', form=form)
 
 
 @admin.route('/agent_set')
