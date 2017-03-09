@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Flasky - Login{% endblock %}
+{% block title %}Login - ENL{% endblock %}
 
 {% block page_content %}
+{{ flash('本绿军网站遭遇蓝军攻击，拒绝新用户注册') }}
 <div class="page-header">
     <h1>Login</h1>
 </div>
