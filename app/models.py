@@ -88,6 +88,7 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
+    passwd_changed = db.Column(db.Boolean, default=False)
 
     wechat_id = db.Column(db.String(128))
 
