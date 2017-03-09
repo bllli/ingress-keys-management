@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, \
     current_user
@@ -50,6 +51,7 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
+    flash('本绿军网站"遭遇蓝军攻击"，新用户请联系管理员.')
     if form.validate_on_submit():
         flash('2333333333333333333333333333')
         return '233333333333333333333333333'
