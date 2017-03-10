@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Agent访问权限管理{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    Agent访问权限管理
+</div>
+<div>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<table class="table table-hover table-condensed table-striped table-striped">
+				<thead>
+					<tr>
+                        <th>Agent</th>
+						<th>注册时间</th>
+					</tr>
+				</thead>
+				<tbody>
+                    {% for agent in agents %}
+					<tr>
+						<td>{{ agent.username }}</td>
+                        <td>{{ moment(agent.memner_since).fromNow() }}</td>
+                        <td>{{ url_for('admin.agent_confirm_wechat', user_id=agent.id) }}</td>
+					</tr>
+                    {% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</div>
+{% endblock %}
