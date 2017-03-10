@@ -19,8 +19,10 @@ def index():
 @login_required
 @admin_required
 def agent_manage():
-    agents = User.query.filter_by(confirmed=False).all()
-    return render_template('admin/agent_management.html', agents=agents)
+    agents_wechat = User.query.filter_by(confirmed=False).all()
+    agents_web = User.query.filter_by(login_request=True).all()
+    return render_template('admin/agent_management.html',
+                           agents_web=agents_web, agents_wechat=agents_wechat)
 
 
 @admin.route('/agent_management/confirm/wechat/<user_id>')
@@ -31,6 +33,19 @@ def agent_confirm_wechat(user_id):
     user.confirmed = True
     db.session.add(user)
     flash('已允许 %s 在微信提交keys.' % user.username)
+    return redirect(url_for('admin.agent_manage'))
+
+
+@admin.route('/agent_management/confirm/web/<user_id>')
+@login_required
+@admin_required
+def agent_confirm_web(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    user.login_confirmed = True
+    user.login_request = False
+    user.role_id = Role.query.filter_by(name='User').first().id
+    db.session.add(user)
+    flash('已允许 %s 登录网页端.' % user.username)
     return redirect(url_for('admin.agent_manage'))
 
 

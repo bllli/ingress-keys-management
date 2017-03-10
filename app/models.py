@@ -31,6 +31,7 @@ class Role(db.Model):
         roles = {
             'WechatUser':(Permission.WECHAT_LOGIN, True),
             'User': (Permission.ADD_PORTAL |
+                     Permission.WECHAT_LOGIN |
                      Permission.WEB_LOGIN, False),
             'Moderator': (Permission.ADD_PORTAL |
                           Permission.MODIFY_PORTAL |
