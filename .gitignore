@@ -40,3 +40,8 @@ nosetests.xml
 
 # Virtual environment
 venv
+.idea/
+migrations/
+passwd.txt
+temp.csv
+tests/
