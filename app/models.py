@@ -13,6 +13,8 @@ class Permission:
     MODIFY_PORTAL = 0x02  # 修改po信息, 比如补充po intel link
     VIEW_AGENTS = 0x04  # 查看key分布情况
     BAN_AGENT = 0x08  # 封禁agent(其实我觉得...没有这个必要)
+    WEB_LOGIN = 0x16
+    WECHAT_LOGIN = 0x32
     ADMINISTER = 0x80
 
 
@@ -27,12 +29,14 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
+            'WechatUser':(Permission.WECHAT_LOGIN, True),
             'User': (Permission.ADD_PORTAL |
-                     Permission.MODIFY_PORTAL, True),
+                     Permission.WEB_LOGIN, False),
             'Moderator': (Permission.ADD_PORTAL |
                           Permission.MODIFY_PORTAL |
                           Permission.VIEW_AGENTS |
-                          Permission.BAN_AGENT, False),
+                          Permission.WEB_LOGIN |
+                          Permission.WECHAT_LOGIN, False),
             'Administrator': (0xff, False),
         }
         for r in roles:
@@ -88,6 +92,8 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
+    login_request = db.Column(db.Boolean)
+    login_confirmed = db.Column(db.Boolean, default=False)
     passwd_changed = db.Column(db.Boolean, default=False)
 
     wechat_id = db.Column(db.String(128))

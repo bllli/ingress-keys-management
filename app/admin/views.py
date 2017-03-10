@@ -19,7 +19,19 @@ def index():
 @login_required
 @admin_required
 def agent_manage():
-    pass
+    agents = User.query.filter_by(confirmed=False).all()
+    return render_template('admin/agent_management.html', agents=agents)
+
+
+@admin.route('/agent_management/confirm/wechat/<user_id>')
+@login_required
+@admin_required
+def agent_confirm_wechat(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    user.confirmed = True
+    db.session.add(user)
+    flash('已允许 %s 在微信提交keys.')
+    return redirect(url_for('admin.agent_manage'))
 
 
 @admin.route('/insert_portals', methods=['POST', 'GET'])

@@ -13,9 +13,13 @@ def dosomething(source, content):
     # 设置/修改昵称
     if content[:len(u"设置昵称")] == u"设置昵称":
         username = content[len(u"设置昵称"):].strip()
+        import re
+        p = re.compile(u'^[a-zA-Z0-9\u4e00-\u9fa5]+$')
         if username == '':
             return '请使用 “设置昵称" + 空格 + 你想起的昵称 来设置昵称'
-        # elif user  # Todo: 正则匹配 u'[a-zA-Z0-9\u4e00-\u9fa5]+'
+        elif not p.match(username):
+            return '起名也要按基本法! 只允许使用大小写字母,数字及汉字'
+        # elif user  # 正则匹配 u'^[a-zA-Z0-9\u4e00-\u9fa5]+$'
         user = User.query.filter_by(wechat_id=source).first()
         if user is not None:
             # 修改昵称
@@ -104,6 +108,22 @@ def dosomething(source, content):
             return '没找到编号对应的po\n' \
                    '请试试"list"查看po列表'
         return render_template("wechat/po.txt", portals=[po], need_link=True)
+    elif content[:len(u"whoami")] == u"whoami":
+        return '我认得你, 你是%s' % current_user.username
+    elif content[:len(u"申请后台权限")] == u"申请后台权限":
+        if current_user.confirmed:
+            return '兄台, 你已经获得登录权限了'
+        if current_user.login_request:
+            return '请求已提交给管理员, 稍安毋躁'
+        import random
+        random_passwd = ''.join([random.choice("abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789")
+                                 for i in range(8)])
+        # 去掉了可能会引起误会的Oo0iIl1L
+        current_user.login_request = True
+        current_user.password = random_passwd
+        current_user.passwd_changed = False
+        db.session.add(current_user)
+        return '您的请求已提交, 请联(督)系(促)管理员审核. 您的初始随机密码是%s.(密码只显示一次)' % random_passwd
 
     return '蛤?\n' \
            '命令如下:\n' \
