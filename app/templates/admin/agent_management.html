@@ -20,11 +20,11 @@
 					</tr>
 				</thead>
 				<tbody>
-                    {% for agent in agents %}
+                    {% for agent in agents_web %}
 					<tr>
 						<td>{{ agent.username }}</td>
                         <td>{{ moment(agent.member_since).fromNow() }}</td>
-                        <td><a href="{{ url_for('admin.agent_confirm_wechat', user_id=agent.id) }}">允许{{ agent.username }}访问微信端</a></td>
+                        <td><a href="{{ url_for('admin.agent_confirm_web', user_id=agent.id) }}">允许{{ agent.username }}访问网站</a></td>
 					</tr>
                     {% endfor %}
 				</tbody>
@@ -44,7 +44,7 @@
 					</tr>
 				</thead>
 				<tbody>
-                    {% for agent in agents %}
+                    {% for agent in agents_wechat %}
 					<tr>
 						<td>{{ agent.username }}</td>
                         <td>{{ moment(agent.member_since).fromNow() }}</td>
