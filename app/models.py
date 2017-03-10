@@ -13,8 +13,8 @@ class Permission:
     MODIFY_PORTAL = 0x02  # 修改po信息, 比如补充po intel link
     VIEW_AGENTS = 0x04  # 查看key分布情况
     BAN_AGENT = 0x08  # 封禁agent(其实我觉得...没有这个必要)
-    WEB_LOGIN = 0x16
-    WECHAT_LOGIN = 0x32
+    WEB_LOGIN = 0x10  # 0b00010000 !我竟然...把这么基础的知识都忘了...真丢人...
+    WECHAT_LOGIN = 0x20
     ADMINISTER = 0x80
 
 
