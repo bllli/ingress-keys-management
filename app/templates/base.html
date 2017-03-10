@@ -28,6 +28,12 @@
                 <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
                 {% if current_user.can(Permission.ADD_PORTAL) %}
                 <li><a href="{{ url_for('portal.add', _external=True) }}">提交Portal</a></li>
+                {% if current_user.can(Permission.VIEW_AGENTS) %}
+                <li><a href="{{ url_for('portal.all_portal') }}">查看所有</a></li>
+                {% if current_user.can(Permission.ADMINISTER) %}
+                <li><a href="{{ url_for('admin.agent_manage') }}">用户审核</a></li>
+                {% endif %}
+                {% endif %}
                 {% endif %}
                 {% endif %}
             </ul>

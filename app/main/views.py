@@ -11,7 +11,7 @@ from ..decorators import admin_required
 @login_required
 def index():
     page = request.args.get('page', 1, type=int)
-    pagination = Portal.query.order_by(Portal.timestamp.desc()).paginate(page, per_page=50, error_out=False)
+    pagination = Portal.query.order_by(Portal.timestamp.asc()).paginate(page, per_page=50, error_out=False)
     portals = pagination.items  # enumerate(pagination.items)
     return render_template('index.html', page=page, portals=portals, pagination=pagination)
 
