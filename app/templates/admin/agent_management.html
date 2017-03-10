@@ -22,8 +22,8 @@
                     {% for agent in agents %}
 					<tr>
 						<td>{{ agent.username }}</td>
-                        <td>{{ moment(agent.memner_since).fromNow() }}</td>
-                        <td>{{ url_for('admin.agent_confirm_wechat', user_id=agent.id) }}</td>
+                        <td>{{ moment(agent.member_since).fromNow() }}</td>
+                        <td><a href="{{ url_for('admin.agent_confirm_wechat', user_id=agent.id) }}">允许{{ agent.username }}访问微信端</a></td>
 					</tr>
                     {% endfor %}
 				</tbody>

@@ -30,7 +30,7 @@ def agent_confirm_wechat(user_id):
     user = User.query.filter_by(id=user_id).first()
     user.confirmed = True
     db.session.add(user)
-    flash('已允许 %s 在微信提交keys.')
+    flash('已允许 %s 在微信提交keys.' % user.username)
     return redirect(url_for('admin.agent_manage'))
 
 
