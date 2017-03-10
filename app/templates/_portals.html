@@ -8,7 +8,7 @@
 						<th>Name</th>
 						<th>Area</th>
 						<th>Intel Link</th>
-                        {% if agents %}
+                        {% if agents and not no_agents_row %}
                         {% for agent in agents %}
                             <th>{{ agent.username }}</th>
                         {% endfor %}
@@ -34,7 +34,7 @@
                                 n/a
                             {% endif %}
                         </td>
-                        {% if agents %}
+                        {% if agents and not no_agents_row %}
                         {% for agent in agents %}
                             <td>
                             {{ agent.having_key(portal.id) }}
