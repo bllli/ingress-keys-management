@@ -112,7 +112,7 @@ def dosomething(source, content):
         return '我认得你, 你是%s' % current_user.username
     elif content[:len(u"申请后台权限")] == u"申请后台权限":
         if current_user.login_confirmed:
-            return '兄台, 你已经获得登录权限了'
+            return '已经获得登录权限了'
         if current_user.login_request:
             return '请求已提交给管理员, 稍安毋躁'
         import random
