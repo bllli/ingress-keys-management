@@ -8,7 +8,7 @@
     {% include "_portals.html" %}
 </div>
 {% if current_user.can(Permission.MODIFY_PORTAL) or portals[0].submitter_id == current_user.id %}
-<button><a href="{{ url_for('portal.modify', po_id=portals[0].id) }}">修改Portal信息</a></button>
+<a class="btn btn-default" href="{{ url_for('portal.modify', po_id=portals[0].id) }}">修改Portal信息</a>
 {% endif %}
 {% if current_user.can(Permission.VIEW_AGENTS) %}
 <div>
