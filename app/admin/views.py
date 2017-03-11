@@ -96,19 +96,17 @@ def insert_portals():
 @login_required
 @admin_required
 def download_csv_po_list():
-    def rush(string=''):
-        if string is None:
-            return ''
-        if string.find(' ') != -1 or string.find(',') != -1:
-            return '"%s"' % string
-        return string
+    import csv
     import time
     import urllib
+    import StringIO
     filename = urllib.quote('all-portal-%s.csv' % time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
-    text = 'id, name, area, link'
+    io = StringIO.StringIO()
+    writer = csv.writer(io)
+    writer.writerow(['id', 'name', 'area', 'link'])
     for po in Portal.query.all():
-        text += '\r\n%d,%s,%s,%s' % (po.id, rush(po.name), rush(po.area), rush(po.link))
-    response = make_response(text)
+        writer.writerow([po.id, po.name, po.area, po.link])
+    response = make_response(io.getvalue())
     response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
     return response
 
