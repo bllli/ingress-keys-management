@@ -32,6 +32,7 @@
                 <li><a href="{{ url_for('portal.all_portal') }}">查看所有</a></li>
                 {% if current_user.can(Permission.ADMINISTER) %}
                 <li><a href="{{ url_for('admin.agent_manage') }}">用户审核</a></li>
+                <li><a class="text-danger" href="{{ url_for('admin.index') }}">后台管理</a> </li>
                 {% endif %}
                 {% endif %}
                 {% endif %}

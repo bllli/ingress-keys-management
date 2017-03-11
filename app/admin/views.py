@@ -12,7 +12,7 @@ from ..decorators import permission_required, admin_required
 @login_required
 @admin_required
 def index():
-    pass
+    return render_template('admin/admin.html')
 
 
 @admin.route('/agent_management')
