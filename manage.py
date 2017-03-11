@@ -28,5 +28,26 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
+@manager.command
+def deploy():
+    from flask_migrate import upgrade
+    from app.models import Role, User
+
+    upgrade()
+
+    Role.insert_roles()
+    set_admin()
+
+
+def set_admin():
+    email = raw_input('admin email:')
+    username = raw_input('admin username:')
+    passwd = raw_input('passwd:')
+    role = Role.query.filter_by(name='Administrator').first()
+    u = User(email=email, username=username, password=passwd, confirmed=True, login_confirmed=True)
+    u.role = role
+    db.session.add(u)
+    db.session.commit()
+
 if __name__ == '__main__':
     manager.run()
