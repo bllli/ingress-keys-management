@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, redirect, url_for, abort, flash, request, jsonify
+from flask import render_template, redirect, url_for, abort, flash, request, jsonify, make_response, send_file
 from flask_login import login_required, current_user
 from . import admin
 from .forms import PortalCSVForm
@@ -57,28 +57,25 @@ def insert_portals():
     if form.validate_on_submit():
         text = form.text.data
         # https://www.ingress.com/intel?ll=39.089453,117.178838&z=17&pll=39.089453,117.178838
-        import re
+        import re, csv
         p = re.compile(u'https://(www\.|)ingress\.com/intel\?ll=(\d+\.\d+),(\d+\.\d+)&z=\d+&pll=(\d+\.\d+),(\d+\.\d+)')
         portals = []
-        with open('temp.csv', 'wb+') as f:
-            f.write(text.encode('utf-8'))
-        with open('temp.csv', 'r') as f:
-            import csv
-            cf = csv.reader(f)
-            for row in cf:
-                try:
-                    name = row[1]
-                    area = row[2]
-                    link = row[3]
-                except IndexError:
-                    print(row)
-                    flash('格式有误!导入失败!')
-                    return redirect(url_for('admin.insert_portals'))
-                portals.append([name, area, link])
+        cf = csv.reader(text.split('\r\n'))
+        for row in cf:
+            print(row)
+            try:
+                int(row[0])
+                name, area, link = row[1], row[2], row[3]
+            except ValueError:
+                continue
+            except IndexError:
+                continue
+            portals.append([name, area, link])
+        if len(portals) == 0:
+            flash('导入...失败!')
+            return redirect('admin.insert_portals')
         for portal in portals:
-            name = u'%s' % portal[0]
-            area = u'%s' % portal[1]
-            link = u'%s' % portal[2]
+            name, area, link = u'%s' % portal[0], u'%s' % portal[1], u'%s' % portal[2]
             m = p.match(link)
             if m is None:
                 link = None
@@ -93,6 +90,27 @@ def insert_portals():
         flash('导入成功!')
         return redirect(url_for('main.index'))
     return render_template('admin/insert_portals.html', form=form)
+
+
+@admin.route('/get_csv/po_list')
+@login_required
+@admin_required
+def download_csv_po_list():
+    def rush(string=''):
+        if string is None:
+            return ''
+        if string.find(' ') != -1 or string.find(',') != -1:
+            return '"%s"' % string
+        return string
+    import time
+    import urllib
+    filename = urllib.quote('all-portal-%s.csv' % time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
+    text = 'id, name, area, link'
+    for po in Portal.query.all():
+        text += '\r\n%d,%s,%s,%s' % (po.id, rush(po.name), rush(po.area), rush(po.link))
+    response = make_response(text)
+    response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+    return response
 
 
 @admin.route('/agent_set')
