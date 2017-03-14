@@ -65,16 +65,20 @@ def dosomething(source, content):
                    '页数请输入数字'
         if page <= 0:
             page = 1
+        if current_user.perpage > 50:
+            perpage = 50
+        else:
+            perpage = current_user.perpage
         pagination = Portal.query.order_by(Portal.id.asc()).\
-            paginate(page, per_page=current_user.perpage or 20, error_out=False)
+            paginate(page, per_page=perpage or 20, error_out=False)
         portals = pagination.items
         if len(portals) == 0:
             page = pagination.pages
             pagination = Portal.query.order_by(Portal.id.asc()).\
-                paginate(page, per_page=current_user.perpage or 20, error_out=False)
+                paginate(page, per_page=perpage or 20, error_out=False)
             portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
-    elif content[:len(u"key")].lower()  == u"key":
+    elif content[:len(u"key")].lower() == u"key":
         prep = content.split(' ')
         try:
             po_id = prep[1]
@@ -98,7 +102,7 @@ def dosomething(source, content):
             return render_template('wechat/po.txt', portals=[po])
         else:
             return 'po编号错误!'
-    elif content[:len(u"po")].lower()  == u"po":
+    elif content[:len(u"po")].lower() == u"po":
         prep = content.split(' ')
         try:
             po_id = prep[1]
@@ -122,6 +126,7 @@ def dosomething(source, content):
         if 10 <= perpage <= 100:
             current_user.perpage = perpage
             db.session.add(current_user)
+            return '分页数已经设置为%d' % perpage
         else:
             return '分页数应在10~100之间'
 
@@ -147,4 +152,5 @@ def dosomething(source, content):
            '查看portal列表: "list"\n' \
            '查看po信息: "po <po编号>"\n' \
            '更改指定po你拥有的key数: "key <po编号> <key数量>"\n' \
-           '设置查看po list的分页数 "perpage <分页数(10~100)>"'
+           '设置查看列表的分页数: "perpage <分页数(10~100)>"' \
+           '请注意，因为微信消息有最大字符限制，微信端的分页数最高为50'
