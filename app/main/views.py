@@ -1,4 +1,5 @@
-from flask import render_template, redirect, url_for, abort, flash, request
+# -*- coding: utf-8 -*-
+from flask import render_template, redirect, url_for, abort, flash, request, make_response
 from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm
@@ -11,7 +12,8 @@ from ..decorators import admin_required
 @login_required
 def index():
     page = request.args.get('page', 1, type=int)
-    pagination = Portal.query.order_by(Portal.timestamp.asc()).paginate(page, per_page=50, error_out=False)
+    pagination = Portal.query.order_by(Portal.timestamp.asc()).\
+        paginate(page, per_page=current_user.perpage or 20, error_out=False)
     portals = pagination.items  # enumerate(pagination.items)
     return render_template('index.html', page=page, portals=portals, pagination=pagination)
 
@@ -28,6 +30,11 @@ def user(username):
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
+        perpage = form.perpage.data
+        if 10 <= perpage <= 100:
+            current_user.perpage = form.perpage.data
+        else:
+            return make_response('不要总想着搞个大新闻')
         current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
@@ -37,6 +44,7 @@ def edit_profile():
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
+    form.perpage.data = current_user.perpage
     return render_template('edit_profile.html', form=form)
 
 

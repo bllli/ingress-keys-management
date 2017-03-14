@@ -98,6 +98,7 @@ class User(UserMixin, db.Model):
     passwd_changed = db.Column(db.Boolean, default=False)
 
     wechat_id = db.Column(db.String(128))
+    perpage = db.Column(db.Integer, default=20)
 
     submit_portals = db.relationship('Portal', backref='submitter', lazy='dynamic')
     keys_having = db.relationship('Have', backref='haver', lazy='dynamic')
@@ -112,6 +113,8 @@ class User(UserMixin, db.Model):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
+        if self.perpage is None:
+            self.perpage = 20
 
     def having_key(self, po_id):
         # return Portal.query.join(Have, Have.portal_id == Portal.id).\

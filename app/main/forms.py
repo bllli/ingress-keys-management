@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, SelectField,\
-    SubmitField
-from wtforms.validators import Required, Length, Email, Regexp
+    SubmitField, IntegerField
+from wtforms.validators import Required, Length, Email, Regexp, NumberRange
 from wtforms import ValidationError
 from ..models import Role, User
 
@@ -15,6 +16,7 @@ class EditProfileForm(FlaskForm):
     name = StringField('Real name', validators=[Length(0, 64)])
     location = StringField('Location', validators=[Length(0, 64)])
     about_me = TextAreaField('About me')
+    perpage = IntegerField('分页设置', validators=[NumberRange(10, 100, '分页范围在10~100之间')])
     submit = SubmitField('Submit')
 
 

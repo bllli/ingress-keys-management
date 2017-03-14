@@ -15,7 +15,7 @@ from flask_wtf.csrf import validate_csrf, ValidationError
 def portal_info(po_id):
     po = Portal.query.get_or_404(po_id)
     page = request.args.get('page', 1, type=int)
-    pagination = User.query.order_by(User.last_seen.desc()).paginate(page, per_page=50, error_out=False)
+    pagination = User.query.order_by(User.last_seen.desc()).paginate(page, per_page= current_user.perpage or 20, error_out=False)
     agents = pagination.items
     return render_template('portal/portal.html',
                            portals=[po], agents=agents, pagination=pagination, page=page, no_agents_row=True)

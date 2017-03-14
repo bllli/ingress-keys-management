@@ -65,11 +65,13 @@ def dosomething(source, content):
                    '页数请输入数字'
         if page <= 0:
             page = 1
-        pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
+        pagination = Portal.query.order_by(Portal.id.asc()).\
+            paginate(page, per_page=current_user.perpage or 20, error_out=False)
         portals = pagination.items
         if len(portals) == 0:
             page = pagination.pages
-            pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
+            pagination = Portal.query.order_by(Portal.id.asc()).\
+                paginate(page, per_page=current_user.perpage or 20, error_out=False)
             portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
     elif content[:len(u"key")].lower()  == u"key":
@@ -108,6 +110,21 @@ def dosomething(source, content):
             return '没找到编号对应的po\n' \
                    '请试试"list"查看po列表'
         return render_template("wechat/po.txt", portals=[po], need_link=True)
+    elif content[:len(u"perpage")].lower() == u"perpage":
+        prep = content.split(' ')
+        try:
+            perpage = int(prep[1])
+        except IndexError:
+            return '参数不全\n' \
+                   '用法：perpage <分页数(10~100)>'
+        except ValueError:
+            return '分页数应该是一个十进制数～'
+        if 10 <= perpage <= 100:
+            current_user.perpage = perpage
+            db.session.add(current_user)
+        else:
+            return '分页数应在10~100之间'
+
     elif content[:len(u"whoami")].lower() == u"whoami":
         return '我认得你, 你是%s' % current_user.username
     elif content[:len(u"申请后台权限")] == u"申请后台权限":
@@ -130,3 +147,4 @@ def dosomething(source, content):
            '查看portal列表: "list"\n' \
            '查看po信息: "po <po编号>"\n' \
            '更改指定po你拥有的key数: "key <po编号> <key数量>"\n' \
+           '设置查看po list的分页数 "perpage <分页数(10~100)>"'
