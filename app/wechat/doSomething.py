@@ -8,7 +8,7 @@ from flask_login import login_user, current_user
 
 def dosomething(source, content):
     # 大小写不敏感
-    content = content.strip().lower()
+    content = content.strip()
 
     # 设置/修改昵称
     if content[:len(u"设置昵称")] == u"设置昵称":
@@ -54,7 +54,7 @@ def dosomething(source, content):
         return '您没有该操作权限, 请联系管理员.'
     else:  # 认证了给个登录
         login_user(user, False)
-    if content[:len(u"list")] == u"list":
+    if content[:len(u"list")].lower() == u"list":
         prep = content.split(' ')
         try:
             page = int(prep[1])
@@ -72,7 +72,7 @@ def dosomething(source, content):
             pagination = Portal.query.order_by(Portal.id.asc()).paginate(page, per_page=30, error_out=False)
             portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
-    elif content[:len(u"key")] == u"key":
+    elif content[:len(u"key")].lower()  == u"key":
         prep = content.split(' ')
         try:
             po_id = prep[1]
@@ -96,7 +96,7 @@ def dosomething(source, content):
             return render_template('wechat/po.txt', portals=[po])
         else:
             return 'po编号错误!'
-    elif content[:len(u"po")] == u"po":
+    elif content[:len(u"po")].lower()  == u"po":
         prep = content.split(' ')
         try:
             po_id = prep[1]
@@ -108,7 +108,7 @@ def dosomething(source, content):
             return '没找到编号对应的po\n' \
                    '请试试"list"查看po列表'
         return render_template("wechat/po.txt", portals=[po], need_link=True)
-    elif content[:len(u"whoami")] == u"whoami":
+    elif content[:len(u"whoami")].lower() == u"whoami":
         return '我认得你, 你是%s' % current_user.username
     elif content[:len(u"申请后台权限")] == u"申请后台权限":
         if current_user.login_confirmed:
@@ -129,4 +129,4 @@ def dosomething(source, content):
            '命令如下:\n' \
            '查看portal列表: "list"\n' \
            '查看po信息: "po <po编号>"\n' \
-           '更改指定po你拥有的key数: "key <po编号> <key数量>"'
+           '更改指定po你拥有的key数: "key <po编号> <key数量>"\n' \
