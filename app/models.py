@@ -9,13 +9,28 @@ from . import db, login_manager
 
 
 class Permission:
-    ADD_PORTAL = 0x01  # 增加新po
-    MODIFY_PORTAL = 0x02  # 修改po信息, 比如补充po intel link
-    VIEW_AGENTS = 0x04  # 查看key分布情况
-    BAN_AGENT = 0x08  # 封禁agent(其实我觉得...没有这个必要)
-    WEB_LOGIN = 0x10  # 0b00010000 !我竟然...把这么基础的知识都忘了...真丢人...
-    WECHAT_LOGIN = 0x20
-    ADMINISTER = 0x80
+    WECHAT_LOGIN =  0x001  # 微信端登陆
+    WEB_LOGIN =     0x002  # 网页端登陆
+    ADD_PORTAL =    0x004  # 增加新po
+    MODIFY_PORTAL = 0x008  # 修改po信息, 比如补充po intel link
+    VIEW_ALL_POS =  0x010  # 查看所有portal
+    VIEW_AGENTS =   0x020  # 查看所有特工
+    VERIFY_AGENTS = 0x040  # 认证特工
+    MANAGE_GROUPS = 0x080  # 管理分组
+    MANAGE_AGENTS = 0x100  # 管理特工（可修改特工权限，但不能修改其他管理员或超级管理员的权限，也不能设置管理员）
+
+    base_permissions = WECHAT_LOGIN | WEB_LOGIN | ADD_PORTAL
+    # 基本权限， 包括登陆网页端和微信端 可以添加po
+    trusty_agent = base_permissions | MODIFY_PORTAL | VIEW_ALL_POS
+    # 可信的特工：在基本权限的基础上，允许修改po信息，并且可以查看所有po
+    intel_user = trusty_agent | VIEW_AGENTS
+    # intel使用者，可以看到所有特工的key情况
+    intel_manager = intel_user | MANAGE_GROUPS
+    # intel管理者，可以管理po分组和agent分组（此功能暂未实现）
+    manager = intel_manager | MANAGE_AGENTS | VERIFY_AGENTS
+    # 权限很大的管理员 可以认证、管理用户（管理用户功能暂未实现）
+    administrator = 0xfff
+    # 超级管理员， 想干啥干啥
 
 
 class Role(db.Model):
@@ -29,16 +44,13 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'WechatUser':(Permission.WECHAT_LOGIN, True),
-            'User': (Permission.ADD_PORTAL |
-                     Permission.WECHAT_LOGIN |
-                     Permission.WEB_LOGIN, False),
-            'Moderator': (Permission.ADD_PORTAL |
-                          Permission.MODIFY_PORTAL |
-                          Permission.VIEW_AGENTS |
-                          Permission.WEB_LOGIN |
-                          Permission.WECHAT_LOGIN, False),
-            'Administrator': (0xff, False),
+            'WechatUser': (Permission.WECHAT_LOGIN | Permission.ADD_PORTAL, True),
+            'User': (Permission.base_permissions, False),
+            'TrustyAgent': (Permission.trusty_agent, False),
+            'IntelUser': (Permission.intel_user, False),
+            'IntelManager': (Permission.intel_manager, False),
+            'Manager': (Permission.manager, False),
+            'Administrator': (0xfff, False),
         }
         for r in roles:
             role = Role.query.filter_by(name=r).first()
@@ -64,6 +76,9 @@ class Portal(db.Model):
     submitter_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     keys = db.relationship('Have', backref='portal', lazy='dynamic')
 
+    def __repr__(self):
+        return '<Portal %r>' % self.name
+
 
 class Have(db.Model):
     __tablename__ = 'haves'
@@ -72,6 +87,9 @@ class Have(db.Model):
     count = db.Column(db.Integer, default=0)
 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Have %d @ %r by user%d>' % (self.count, self.portal_id, self.user_id)
 
     @staticmethod
     def ping(target, value, oldvalue, initiator):
