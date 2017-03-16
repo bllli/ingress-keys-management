@@ -18,6 +18,7 @@ class Permission:
     VERIFY_AGENTS = 0x040  # 认证特工
     MANAGE_GROUPS = 0x080  # 管理分组
     MANAGE_AGENTS = 0x100  # 管理特工（可修改特工权限，但不能修改其他管理员或超级管理员的权限，也不能设置管理员）
+    ADMINISTER    = 0x800
 
     base_permissions = WECHAT_LOGIN | WEB_LOGIN | ADD_PORTAL
     # 基本权限， 包括登陆网页端和微信端 可以添加po
