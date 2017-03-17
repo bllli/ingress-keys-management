@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, abort, flash, request, jso
 from flask_login import login_required, current_user
 from . import admin
 from .forms import PortalCSVForm
-from .. import db, logger
+from .. import db, log
 from ..models import Role, User, Permission, Portal, Have
 from ..decorators import permission_required, admin_required
 
@@ -72,7 +72,7 @@ def insert_portals():
                 continue
             portals.append([name, area, link])
         if len(portals) == 0:
-            logger.warning('%s 试图导入po list' % current_user.username)
+            log(current_user, '导入po list失败')
             flash('导入...失败!')
             return redirect(url_for('admin.insert_portals'))
         for portal in portals:
@@ -88,8 +88,8 @@ def insert_portals():
                     link = None
             po = Portal(name=name, area=area, link=link)
             db.session.add(po)
-        flash('导入成功!')
-        logger.warning('%s 批量导入po成功，共导入%d个' % (current_user.username, len(portals)))
+        flash('导入成功! 共%d个po信息' % len(portals))
+        log(current_user, '批量导入po成功，共导入%d个' % len(portals))
         return redirect(url_for('main.index'))
     return render_template('admin/insert_portals.html', form=form)
 

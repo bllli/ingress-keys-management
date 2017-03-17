@@ -20,7 +20,10 @@ login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
-logger = logging.getLogger("werkzeug")
+
+def log(user, message):
+    logger = logging.getLogger("werkzeug")
+    logger.warning('%s | %s | %s' % (user.username, user.role.name, message))
 
 JQUERY_VERSION = '2.0.3'
 HTML5SHIV_VERSION = '3.7'
