@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, redirect, url_for, abort, flash, request, jsonify, make_response, send_file
+from flask import render_template, redirect, url_for, abort, flash, request, jsonify, make_response
 from flask_login import login_required, current_user
 from . import admin
 from .forms import PortalCSVForm
-from .. import db
+from .. import db, logger
 from ..models import Role, User, Permission, Portal, Have
 from ..decorators import permission_required, admin_required
 
@@ -17,7 +17,7 @@ def index():
 
 @admin.route('/agent_management')
 @login_required
-@admin_required
+@permission_required(Permission.VERIFY_AGENTS)
 def agent_manage():
     agents_wechat = User.query.filter_by(confirmed=False).all()
     agents_web = User.query.filter_by(login_request=True).all()
@@ -27,7 +27,7 @@ def agent_manage():
 
 @admin.route('/agent_management/confirm/wechat/<user_id>')
 @login_required
-@admin_required
+@permission_required(Permission.VERIFY_AGENTS)
 def agent_confirm_wechat(user_id):
     user = User.query.filter_by(id=user_id).first()
     user.confirmed = True
@@ -38,7 +38,7 @@ def agent_confirm_wechat(user_id):
 
 @admin.route('/agent_management/confirm/web/<user_id>')
 @login_required
-@admin_required
+@permission_required(Permission.VERIFY_AGENTS)
 def agent_confirm_web(user_id):
     user = User.query.filter_by(id=user_id).first()
     user.login_confirmed = True
@@ -72,8 +72,9 @@ def insert_portals():
                 continue
             portals.append([name, area, link])
         if len(portals) == 0:
+            logger.warning('%s 试图导入po list' % current_user.username)
             flash('导入...失败!')
-            return redirect('admin.insert_portals')
+            return redirect(url_for('admin.insert_portals'))
         for portal in portals:
             name, area, link = u'%s' % portal[0], u'%s' % portal[1], u'%s' % portal[2]
             m = p.match(link)
@@ -88,13 +89,14 @@ def insert_portals():
             po = Portal(name=name, area=area, link=link)
             db.session.add(po)
         flash('导入成功!')
+        logger.warning('%s 批量导入po成功，共导入%d个' % (current_user.username, len(portals)))
         return redirect(url_for('main.index'))
     return render_template('admin/insert_portals.html', form=form)
 
 
 @admin.route('/get_csv/po_list')
 @login_required
-@admin_required
+@permission_required(Permission.VIEW_ALL_POS)
 def download_csv_po_list():
     import csv
     import time

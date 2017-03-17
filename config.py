@@ -20,9 +20,18 @@ class Config:
     ENL_MAIL_SENDER = MAIL_USERNAME + '@qq.com'
     ENL_ADMIN = os.environ.get('ENL_ADMIN') or 'your administrator email account'
 
-    @staticmethod
-    def init_app(app):
-        pass
+    logfile = os.environ.get('LOG_FILE') or os.path.join(basedir, 'enl.log')
+
+    @classmethod
+    def init_app(cls, app):
+        import logging
+        from logging import FileHandler, Formatter, getLogger
+        logger = getLogger('werkzeug')
+        file_handler = FileHandler(filename=cls.logfile, )
+        file_handler.setLevel(logging.WARNING)
+        file_handler.setFormatter(Formatter('%(asctime)s %(levelname)s: %(message)s '))
+        logger.addHandler(file_handler)
+        app.logger.addHandler(file_handler)
 
 
 class DevelopmentConfig(Config):

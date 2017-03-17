@@ -6,6 +6,9 @@ Ingress-keys-management
 使用了[Flasky](https://github.com/miguelgrinberg/flasky)
 
 代码开源，不分蓝绿；欢迎issue， 欢迎pr。
+## 功能简介
+### 微信端
+### 网页端
 
 ## 部署
 ### 准备
@@ -51,7 +54,10 @@ MAIL_USERNAME=你的QQ邮箱
 MAIL_PASSWORD=QQ邮箱授权码
 ENL_ADMIN=管理员邮箱
 ```
-
+设置
+```
+ENL_CONFIG=production
+```
 ### 创建数据库，钦定管理员
 ```
 python manager.py db init
