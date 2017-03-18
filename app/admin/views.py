@@ -33,6 +33,7 @@ def agent_confirm_wechat(user_id):
     user.confirmed = True
     db.session.add(user)
     flash('已允许 %s 在微信提交keys.' % user.username)
+    log(current_user, '已允许 %s 登陆微信端.' % user.username)
     return redirect(url_for('admin.agent_manage'))
 
 
@@ -46,6 +47,7 @@ def agent_confirm_web(user_id):
     user.role_id = Role.query.filter_by(name='User').first().id
     db.session.add(user)
     flash('已允许 %s 登录网页端.' % user.username)
+    log(current_user, '已允许 %s 登录网页端.' % user.username)
     return redirect(url_for('admin.agent_manage'))
 
 
@@ -110,11 +112,39 @@ def download_csv_po_list():
         writer.writerow([po.id, po.name, po.area, po.link])
     response = make_response(io.getvalue())
     response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+    log(current_user, '下载了po list csv文件')
     return response
 
 
-@admin.route('/agent_set')
+@admin.route('/agent-list')
 @login_required
 @admin_required
-def agent_set():
+def agent_list():
+    """
+    为超级管理员准备的用户名单
+    允许封禁/解封用户 设定任一用户权限(除其他超级管理员外)
+    :return:
+    """
+    pass
+
+
+@admin.route('/agent_groups')
+@login_required
+@permission_required(Permission.MANAGE_GROUPS)
+def agent_groups():
+    """
+    管理用户集合
+    :return:
+    """
+    pass
+
+
+@admin.route('/po-groups')
+@login_required
+@permission_required(Permission.MANAGE_GROUPS)
+def po_groups():
+    """
+    管理po集合
+    :return:
+    """
     pass

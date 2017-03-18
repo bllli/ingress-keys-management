@@ -9,12 +9,12 @@ from . import db, login_manager
 
 
 class Permission:
-    WECHAT_LOGIN =  0x001  # 微信端登陆
-    WEB_LOGIN =     0x002  # 网页端登陆
-    ADD_PORTAL =    0x004  # 增加新po
+    WECHAT_LOGIN  = 0x001  # 微信端登陆
+    WEB_LOGIN     = 0x002  # 网页端登陆
+    ADD_PORTAL    = 0x004  # 增加新po
     MODIFY_PORTAL = 0x008  # 修改po信息, 比如补充po intel link
-    VIEW_ALL_POS =  0x010  # 查看所有portal
-    VIEW_AGENTS =   0x020  # 查看所有特工
+    VIEW_ALL_POS  = 0x010  # 查看所有portal
+    VIEW_AGENTS   = 0x020  # 查看所有特工
     VERIFY_AGENTS = 0x040  # 认证特工
     MANAGE_GROUPS = 0x080  # 管理分组
     MANAGE_AGENTS = 0x100  # 管理特工（可修改特工权限，但不能修改其他管理员或超级管理员的权限，也不能设置管理员）
