@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}用户列表 | 用户管理{% endblock %}
+
+{% block page_content %}
+    <div class="page_header">
+      <h1>
+          用户列表
+      </h1>
+    </div>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<table class="table table-hover table-condensed table-striped table-striped">
+				<thead>
+					<tr>
+                        <th>Agent</th>
+						<th>注册时间</th>
+                        <th>最后登录</th>
+					</tr>
+				</thead>
+				<tbody>
+                    {% for agent in agents %}
+					<tr>
+						<td>{{ agent.username }}</td>
+                        <td>{{ moment(agent.member_since).fromNow() }}</td>
+                        <td>{{ moment(agent.last_seen).fromNow() }}</td>
+                        {% if current_user.can(Permission.ADMINISTER) %}
+                        <td>
+                            <a href="{{ url_for('main.edit_profile_admin', id=agent.id) }}">
+                                管理{{ agent.username }}
+                            </a>
+                        </td>
+                        {% endif %}
+					</tr>
+                    {% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

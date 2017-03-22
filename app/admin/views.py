@@ -125,7 +125,13 @@ def agent_list():
     允许封禁/解封用户 设定任一用户权限(除其他超级管理员外)
     :return:
     """
-    pass
+    page = request.args.get('page', 1, type=int)
+    pagination = User.query.order_by(User.last_seen.desc()).paginate(page, per_page=current_user.perpage or 20,
+                                                                     error_out=False)
+    agents = pagination.items
+    return render_template('admin/agent_list.html',
+                           agents=agents, pagination=pagination, page=page)
+
 
 
 @admin.route('/agent_groups')
