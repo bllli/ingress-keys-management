@@ -4,8 +4,8 @@ from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm
 from .. import db
-from ..models import Role, User, Portal
-from ..decorators import admin_required
+from ..models import Role, User, Portal, Permission
+from ..decorators import admin_required, permission_required
 
 
 @main.route('/')
@@ -50,14 +50,18 @@ def edit_profile():
 
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@permission_required(Permission.MANAGE_AGENTS)
 def edit_profile_admin(id):
     user = User.query.get_or_404(id)
+    if user.role.permissions >= current_user.role.permissions and user != current_user:
+        abort(403)
     form = EditProfileAdminForm(user=user)
     if form.validate_on_submit():
         user.email = form.email.data
         user.username = form.username.data
         user.confirmed = form.confirmed.data
+        if Role.query.get(form.role.data).permissions > current_user.role.permissions:
+            abort(403)
         user.role = Role.query.get(form.role.data)
         user.name = form.name.data
         user.location = form.location.data

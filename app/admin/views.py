@@ -118,7 +118,7 @@ def download_csv_po_list():
 
 @admin.route('/agent-list')
 @login_required
-@admin_required
+@permission_required(Permission.MANAGE_AGENTS)
 def agent_list():
     """
     为超级管理员准备的用户名单

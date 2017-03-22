@@ -2,6 +2,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, SelectField,\
     SubmitField, IntegerField
+from flask_login import current_user
 from wtforms.validators import Required, Length, Email, Regexp, NumberRange
 from wtforms import ValidationError
 from ..models import Role, User
@@ -36,8 +37,13 @@ class EditProfileAdminForm(FlaskForm):
 
     def __init__(self, user, *args, **kwargs):
         super(EditProfileAdminForm, self).__init__(*args, **kwargs)
-        self.role.choices = [(role.id, role.name)
-                             for role in Role.query.order_by(Role.name).all()]
+        if user.role.name == 'Administrator':
+            admin = Role.query.filter_by(name='Administrator').first()
+            self.role.choices = [(admin.id, admin.name)]
+        else:
+            self.role.choices = [(role.id, role.name)
+                                 for role in Role.query.order_by(Role.name).all()
+                                 if role.permissions < current_user.role.permissions]
         self.user = user
 
     def validate_email(self, field):
