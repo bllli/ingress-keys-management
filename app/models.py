@@ -119,6 +119,10 @@ class User(UserMixin, db.Model):
     wechat_id = db.Column(db.String(128))
     perpage = db.Column(db.Integer, default=20)
 
+    banned = db.Column(db.Boolean, default=False)
+    banner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    bans = db.relationship('User', backref='banner', remote_side='User.id')
+
     submit_portals = db.relationship('Portal', backref='submitter', lazy='dynamic')
     keys_having = db.relationship('Have', backref='haver', lazy='dynamic')
 

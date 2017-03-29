@@ -14,11 +14,13 @@ from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
-        if not current_user.confirmed \
-                and request.endpoint \
-                and request.endpoint[:5] != 'auth.' \
+        if request.endpoint \
+            and request.endpoint[:5] != 'auth.' \
                 and request.endpoint != 'static':
-            return redirect(url_for('auth.unconfirmed'))
+            if not current_user.confirmed:
+                return redirect(url_for('auth.unconfirmed'))
+            if current_user.banned:
+                return redirect(url_for('auth.banned'))
 
 
 @auth.route('/unconfirmed')
@@ -26,6 +28,14 @@ def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
+
+
+@auth.route('/banned')
+def banned():
+    if current_user.banned:
+        if current_user.is_anonymous or not current_user.banned:
+            return redirect(url_for('main.index'))
+        return render_template('auth/banned.html')
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -59,7 +69,7 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    flash('本绿军网站"遭遇蓝军攻击"，新用户请联系管理员.')
+    flash('本绿军网站"遭遇蓝军攻击"，新用户请联系本地大佬.')
     if form.validate_on_submit():
         flash('2333333333333333333333333333')
         return '233333333333333333333333333'

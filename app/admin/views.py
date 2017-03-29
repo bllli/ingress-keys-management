@@ -121,8 +121,8 @@ def download_csv_po_list():
 @permission_required(Permission.MANAGE_AGENTS)
 def agent_list():
     """
-    为超级管理员准备的用户名单
-    允许封禁/解封用户 设定任一用户权限(除其他超级管理员外)
+    为管理员及超级管理员准备的用户名单
+    允许封禁/解封用户 设定低权用户权限
     :return:
     """
     page = request.args.get('page', 1, type=int)

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}账号被禁用 - ENL{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        Hello, {{ current_user.username }}!
+    </h1>
+    <p>
+        非常抱歉, 您的账户已被禁用.如有疑问请联系本地大佬.
+    </p>
+</div>
+{% endblock %}
