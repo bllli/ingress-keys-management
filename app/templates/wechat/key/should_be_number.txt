@@ -1,2 +1,2 @@
 数量应为数字
-{% include "../help/key.txt" %}
+{% include "wechat/help/key.txt" %}

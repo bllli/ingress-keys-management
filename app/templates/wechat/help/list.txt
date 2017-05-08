@@ -2,4 +2,4 @@
 功能:查看po列表.
 页数必须为正整数,未指定页号时默认查看第一页.
 设置分页请使用perpage命令
-{% include "perpage.txt" %}
+{% include "wechat/help/perpage.txt" %}
