@@ -54,7 +54,7 @@ def login():
                 flash('为确保安全, 请修改您的默认密码')
                 return redirect(url_for('auth.change_password'))
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash('Invalid username or password.')
+        flash('账号密码有误!')
     return render_template('auth/login.html', form=form)
 
 
@@ -62,14 +62,14 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.')
+    flash('已登出.')
     return redirect(url_for('main.index'))
 
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    flash('本绿军网站"遭遇蓝军攻击"，新用户请联系本地大佬.')
+    flash('新用户请联系本地大佬.')
     if form.validate_on_submit():
         flash('2333333333333333333333333333')
         return '233333333333333333333333333'
@@ -117,10 +117,10 @@ def change_password():
             current_user.password = form.password.data
             current_user.passwd_changed = True
             db.session.add(current_user)
-            flash('Your password has been updated.')
+            flash('您的密码已更新.')
             return redirect(url_for('main.index'))
         else:
-            flash('Invalid password.')
+            flash('密码有误!.')
     return render_template("auth/change_password.html", form=form)
 
 
@@ -153,7 +153,7 @@ def password_reset(token):
         if user is None:
             return redirect(url_for('main.index'))
         if user.reset_password(token, form.password.data):
-            flash('Your password has been updated.')
+            flash('您的密码已更新.')
             return redirect(url_for('auth.login'))
         else:
             return redirect(url_for('main.index'))
