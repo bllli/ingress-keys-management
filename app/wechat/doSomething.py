@@ -64,7 +64,7 @@ def dosomething(source, content):
             return render_template('wechat/help/list.txt')
         if page <= 0:
             page = 1
-        perpage = current_user.perpage if current_user.perpage > 50 else 50
+        perpage = current_user.perpage if current_user.perpage < 50 else 50
         pagination = Portal.query.order_by(Portal.id.asc()).\
             paginate(page, per_page=perpage or 20, error_out=False)
         portals = pagination.items
