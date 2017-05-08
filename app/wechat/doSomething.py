@@ -7,25 +7,30 @@ from flask_login import login_user, current_user
 
 
 def dosomething(source, content):
-    # 大小写不敏感
+    """
+    微信命令行???
+    :param source: 某微信用户在本公众号上的id string
+    :param content: 用户传来的命令字符串 string
+    :return: 返回信息 string
+    """
     content = content.strip()
-
+    # 登录前允许的操作
     # 设置/修改昵称
     if content[:len(u"设置昵称")] == u"设置昵称":
         username = content[len(u"设置昵称"):].strip()
         import re
         p = re.compile(u'^[a-zA-Z0-9\u4e00-\u9fa5]+$')
         if username == '':
-            return '请使用 “设置昵称" + 空格 + 你想起的昵称 来设置昵称'
+            return render_template('wechat/username/username_no_name.txt')
         elif not p.match(username):
-            return '起名也要按基本法! 只允许使用大小写字母,数字及汉字'
+            return render_template('wechat/username/username_wrong.txt')
         # elif user  # 正则匹配 u'^[a-zA-Z0-9\u4e00-\u9fa5]+$'
         user = User.query.filter_by(wechat_id=source).first()
         if user is not None:
             # 修改昵称
             if User.query.filter_by(username=username).first() is not None:
                 # 已被占用，不允许重新设置
-                return '此昵称已被占用=。=|||'
+                return render_template('wechat/username/username_used.txt')
             else:
                 # 未被占用，可以修改
                 user.username = username
@@ -35,25 +40,20 @@ def dosomething(source, content):
             # 设置昵称
             if User.query.filter_by(username=username).first() is not None:
                 # 已被占用，不允许重新设置
-                return '此昵称已被占用=。=|||'
+                return render_template('wechat/username/username_used.txt')
             else:
                 user = User(username=username, wechat_id=source)
                 db.session.add(user)
-                return 'Agent code设置完成。\n' \
-                       '请联系管理员获取操作权限\n' \
-                       '命令如下:\n' \
-                       '查看portal列表: "list"或"list <页数>"\n' \
-                       '查看po信息: "po <po编号>"\n' \
-                       '更改指定po你拥有的key数: "key <po编号> <key数量>"'
-
+                return render_template('wechat/username/username_ok.txt')
     # 拦截未设置昵称的和未通过验证的用户的请求
     user = User.query.filter_by(wechat_id=source).first()
     if user is None:  # 没昵称请去设置昵称
-        return '请先使用 “设置昵称” + 空格 + 你想起的昵称 来设置昵称'
+        return render_template('wechat/auth/username_please.txt')
     if not user.confirmed:  # 没认证请联系管理员进行认证
-        return '您没有该操作权限, 请联系管理员.'
+        return render_template('wechat/auth/unconfirmed.txt')
     else:  # 认证了给个登录
         login_user(user, False)
+    # 登陆后允许的操作
     if content[:len(u"list")].lower() == u"list":
         prep = content.split(' ')
         try:
@@ -61,14 +61,10 @@ def dosomething(source, content):
         except IndexError:
             page = 1
         except ValueError:
-            return '查看po列表: "list <页数>"\n' \
-                   '页数请输入数字'
+            return render_template('wechat/help/list.txt')
         if page <= 0:
             page = 1
-        if current_user.perpage > 50:
-            perpage = 50
-        else:
-            perpage = current_user.perpage
+        perpage = current_user.perpage if current_user.perpage > 50 else 50
         pagination = Portal.query.order_by(Portal.id.asc()).\
             paginate(page, per_page=perpage or 20, error_out=False)
         portals = pagination.items
@@ -78,17 +74,18 @@ def dosomething(source, content):
                 paginate(page, per_page=perpage or 20, error_out=False)
             portals = pagination.items
         return render_template('wechat/po.txt', pagination=pagination, portals=portals)
+    # 添加keys
     elif content[:len(u"key")].lower() == u"key":
         prep = content.split(' ')
         try:
             po_id = prep[1]
             count = int(prep[2])
         except IndexError:
-            return '更改指定po你拥有的key数: "key <po编号> <key数量>"'
+            return render_template('wechat/help/key.txt')
         except ValueError:
-            return '数量应为数字'
-        if count < 0:
-            return '数量应大于0'
+            return render_template('wechat/key/should_be_number.txt')
+        if not count > 0:
+            return render_template('wechat/key/should_larger_than_zero.txt')
         po = Portal.query.filter_by(id=po_id).first()
         if po is not None:
             ha = Have.query.filter_by(portal_id=po_id,
@@ -101,7 +98,7 @@ def dosomething(source, content):
             db.session.commit()
             return render_template('wechat/po.txt', portals=[po])
         else:
-            return 'po编号错误!'
+            return render_template('wechat/key/wrong_portal_id.txt')
     elif content[:len(u"po")].lower() == u"po":
         prep = content.split(' ')
         try:
@@ -146,11 +143,11 @@ def dosomething(source, content):
         current_user.passwd_changed = False
         db.session.add(current_user)
         return '您的请求已提交, 请联(督)系(促)管理员审核. 您的初始随机密码是%s.(密码只显示一次)' % random_passwd
-
-    return '蛤?\n' \
-           '命令如下:\n' \
-           '查看portal列表: "list"\n' \
-           '查看po信息: "po <po编号>"\n' \
-           '更改指定po你拥有的key数: "key <po编号> <key数量>"\n' \
-           '设置查看列表的分页数: "perpage <分页数(10~100)>"' \
-           '请注意，因为微信消息有最大字符限制，微信端的分页数最高为50'
+    # 进阶操作介绍
+    elif content[:len(u"more")].lower() == u"more":
+        return '设置查看列表的分页数: "perpage <分页数(10~100)>"' \
+               '请注意，因为微信消息有最大字符限制，微信端的分页数最高为50'
+    # 帮助
+    elif content[:len(u"help")].lower() == u"help":
+        pass
+    return render_template('wechat/help/base.txt')

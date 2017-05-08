@@ -1,0 +1,5 @@
+基础命令列表
+查看portal列表: "list"
+查看po信息: "po <po编号>"
+更改指定po你拥有的key数: "key <po编号> <key数量>"
+进阶操作: "more"
