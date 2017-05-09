@@ -1,0 +1,6 @@
+{% if wrong_po_id %}查无此po
+{% endif %}用法:po <po编号>
+功能:查看po详细信息
+po编号应为整数
+
+查询po编号请使用"list [页号]"命令查看po列表

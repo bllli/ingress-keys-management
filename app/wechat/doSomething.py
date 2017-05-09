@@ -4,6 +4,7 @@ from .. import db
 from ..models import User, Portal, Have
 from flask import render_template
 from flask_login import login_user, current_user
+from jinja2.exceptions import TemplateNotFound
 
 
 def dosomething(source, content):
@@ -104,20 +105,17 @@ def dosomething(source, content):
         try:
             po_id = prep[1]
         except IndexError:
-            return '查看po信息: "po <po编号>"\n' \
-                   '没找到po编号'
+            return render_template('wechat/help/po.txt')
         po = Portal.query.filter_by(id=po_id).first()
         if po is None:
-            return '没找到编号对应的po\n' \
-                   '请试试"list"查看po列表'
+            return render_template('wechat/help/po.txt', wrong_po_id=True)
         return render_template("wechat/po.txt", portals=[po], need_link=True)
     elif content[:len(u"perpage")].lower() == u"perpage":
         prep = content.split(' ')
         try:
             perpage = int(prep[1])
         except IndexError:
-            return '参数不全\n' \
-                   '用法：perpage <分页数(10~100)>'
+            return render_template('wechat/help/perpage.txt')
         except ValueError:
             return '分页数应该是一个十进制数～'
         if 10 <= perpage <= 100:
@@ -145,9 +143,16 @@ def dosomething(source, content):
         return '您的请求已提交, 请联(督)系(促)管理员审核. 您的初始随机密码是%s.(密码只显示一次)' % random_passwd
     # 进阶操作介绍
     elif content[:len(u"more")].lower() == u"more":
-        return '设置查看列表的分页数: "perpage <分页数(10~100)>"' \
-               '请注意，因为微信消息有最大字符限制，微信端的分页数最高为50'
+        return render_template('wechat/help/more.txt')
     # 帮助
     elif content[:len(u"help")].lower() == u"help":
-        pass
+        prep = content.split(' ')
+        try:
+            code = prep[1]
+        except IndexError:
+            return render_template('wechat/help/help.txt')
+        try:
+            return render_template('wechat/help/%s.txt' % code)
+        except TemplateNotFound:
+            return '没找到该命令'
     return render_template('wechat/help/base.txt')
