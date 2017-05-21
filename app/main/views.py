@@ -9,6 +9,11 @@ from ..decorators import admin_required, permission_required
 
 
 @main.route('/')
+def fake_index():
+    return render_template('fake_index.html')
+
+
+@main.route('/index')
 @login_required
 def index():
     page = request.args.get('page', 1, type=int)
