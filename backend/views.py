@@ -77,6 +77,9 @@ class PortalViewSet(DefaultMixin, viewsets.ModelViewSet):
     queryset = Portal.objects.all()
     serializer_class = serializers.PortalSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class AreaViewSet(DefaultMixin, viewsets.ModelViewSet):
     queryset = Area.objects.all()

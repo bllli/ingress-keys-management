@@ -28,7 +28,7 @@ class PortalSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
-    areas = AreaSerializer(many=True)
+    areas = serializers.HyperlinkedRelatedField(view_name='area-detail', many=True, queryset=Area.objects.all())
 
     class Meta:
         model = Portal
