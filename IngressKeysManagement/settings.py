@@ -37,7 +37,25 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'backend',
 ]
+
+
+REST_FRAMEWORK = {
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAdminUser',
+    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'backend.authentication.ExpiringTokenAuthentication',
+    ),
+    'PAGE_SIZE': 10
+}
+
+REST_FRAMEWORK_TOKEN_EXPIRE_MINUTES = 60
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
