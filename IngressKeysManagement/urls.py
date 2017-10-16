@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/token/', views.ObtainExpiringAuthToken.as_view(), name='api-token'),
+    url(r'^api/myself/$', views.UserView.as_view()),
     url(r'^api/', include(router.urls)),
     url(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ]

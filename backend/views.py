@@ -10,6 +10,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.views import APIView
 
 from backend import serializers
 from backend.permissions import IsOwnerOrReadOnly
@@ -92,3 +93,13 @@ class CommentViewSet(DefaultMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+
+class UserView(DefaultMixin, APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, format=None):
+        content = {
+            'user': request.user.username
+        }
+        return Response(content)
