@@ -95,7 +95,12 @@ class CommentViewSet(DefaultMixin, viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class UserView(DefaultMixin, APIView):
+class UserView(APIView):
+    authentication_classes = (
+        authentication.SessionAuthentication,
+        authentication.BasicAuthentication,
+        authentication.TokenAuthentication
+    )
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, format=None):
