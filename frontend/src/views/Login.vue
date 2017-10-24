@@ -78,13 +78,13 @@
             }
           }).then(function (response) {
             self.$store.commit(types.LOGIN, response.data.token)
-            console.log('token: ', response.data)
+//            console.log('token got: ', response.data.token)
             let redirect = decodeURIComponent(self.$route.query.redirect || '/')
             self.$router.push({
               path: redirect
             })
           }).catch(function (error) {
-            console.log('error: ', error)
+//            console.log('error: ', error)
             self.login_error = true
           })
         }

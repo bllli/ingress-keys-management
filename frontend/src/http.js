@@ -18,10 +18,10 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.interceptors.request.use(
   config => {
     if (store.state.token) {
-      config.headers.Authorization = `Token ${store.state.password}`
+      config.headers.Authorization = 'Token ' + store.state.token
+      // console.log('Token in http ', store.state.token)
     }
-    // console.log('config: ')
-    // console.log(config)
+    // console.log('config: ', console.log(config))
     return config
   },
   err => {
@@ -33,13 +33,11 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   response => {
-    // console.log('response: ')
-    // console.log(response)
+    // console.log('response: ', console.log(response))
     return response
   },
   error => {
-    // console.log('err: ')
-    // console.log(error)
+    // console.log('err: ', console.log(error))
     if (error.response) {
       switch (error.response.status) {
         case 401:
