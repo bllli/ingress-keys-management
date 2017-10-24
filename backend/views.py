@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, Group
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import authentication
@@ -28,7 +29,7 @@ class DefaultMixin(object):
     )
 
     permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
+        permissions.IsAuthenticated,
     )
     pagination_by = 25
     pagination_by_param = 'page_size'
@@ -68,6 +69,21 @@ class UserViewSet(DefaultMixin, viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
 
+    def list(self, request, *args, **kwargs):
+        if request.query_params.get('query') == 'myself':  # 查询自己
+            user = get_object_or_404(User.objects.all(), pk=request.user.id)
+            serializer = serializers.UserSerializer(user)
+            serializer.context['request'] = request  # 生成超链接需要
+            return Response(serializer.data)
+        return super(UserViewSet, self).list(request, args, kwargs)
+
+    # def retrieve(self, request, pk=None, *args, **kwargs):
+    #     queryset = User.objects.all()
+    #     user = get_object_or_404(queryset, pk=pk)
+    #     serializer = serializers.UserSerializer(user)
+    #     serializer.context['request'] = request
+    #     return Response(serializer.data)
+
 
 class GroupViewSet(DefaultMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
@@ -103,3 +119,16 @@ class UserView(DefaultMixin, APIView):
             'user': request.user.username
         }
         return Response(content)
+
+
+class IITCView(APIView):
+
+    @csrf_exempt
+    def get(self, request, format=None):
+        print(self.request.user)
+        return Response({})
+
+    @csrf_exempt
+    def post(self, request):
+        print(self.request.data)
+        return Response({})
