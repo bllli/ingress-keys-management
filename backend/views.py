@@ -1,4 +1,5 @@
 import datetime
+
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +16,7 @@ from rest_framework.views import APIView
 
 from backend import serializers
 from backend.permissions import IsOwnerOrReadOnly
-from backend.models import Area, Portal, Comment, Key
+from backend.models import Tag, Portal, Comment, Key
 
 
 EXPIRE_MINUTES = getattr(settings, 'REST_FRAMEWORK_TOKEN_EXPIRE_MINUTES', 1)
@@ -99,8 +100,8 @@ class PortalViewSet(DefaultMixin, viewsets.ModelViewSet):
 
 
 class AreaViewSet(DefaultMixin, viewsets.ModelViewSet):
-    queryset = Area.objects.all()
-    serializer_class = serializers.AreaSerializer
+    queryset = Tag.objects.all()
+    serializer_class = serializers.TagSerializer
 
 
 class CommentViewSet(DefaultMixin, viewsets.ModelViewSet):
@@ -109,21 +110,6 @@ class CommentViewSet(DefaultMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-
-class UserView(APIView):
-    authentication_classes = (
-        authentication.SessionAuthentication,
-        authentication.BasicAuthentication,
-        authentication.TokenAuthentication
-    )
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request, format=None):
-        content = {
-            'user': request.user.username
-        }
-        return Response(content)
 
 
 class IITCView(APIView):

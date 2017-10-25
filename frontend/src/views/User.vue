@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ui middle aligned center">
     {{ username }}
   </div>
 </template>
@@ -15,10 +15,10 @@
     },
     mounted: function () {
       const self = this
-      this.axios.get('/api/myself/', {
+      this.axios.get('/api/users/?query=myself', {
       }).then(function (response) {
         console.log(response)
-        self.username = response.data.user
+        self.username = response.data.username
       }).catch(function (error) {
         console.log(error)
       })

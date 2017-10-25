@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from backend.models import Portal, Comment, Area, Key
+from backend.models import Portal, Comment, Tag, TagType
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -11,28 +11,42 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'name')
 
 
-class AreaSerializer(serializers.HyperlinkedModelSerializer):
+class TagTypeSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
     class Meta:
-        model = Area
+        model = TagType
+        fields = ()
+
+    def get_url(self, obj):
+        request = self.context['request']
+        return reverse('tagtype-detail', kwargs={'pk': obj.pk}, request=request)
+
+
+class TagSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField()
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Tag
         fields = ('id', 'url', 'name')
 
     def get_url(self, obj):
         request = self.context['request']
-        return reverse('area-detail', kwargs={'pk': obj.pk}, request=request)
+        return reverse('tag-detail', kwargs={'pk': obj.pk}, request=request)
 
 
 class PortalSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
-    areas = serializers.HyperlinkedRelatedField(view_name='area-detail', many=True, queryset=Area.objects.all())
+    tags = serializers.HyperlinkedRelatedField(view_name='tag-detail',
+                                               many=True, queryset=Tag.objects.all())
 
     class Meta:
         model = Portal
-        fields = ('id', 'url', 'title', 'link', 'nickname', 'areas')
+        fields = ('id', 'url', 'title', 'link', 'nickname', 'tags')
 
     def get_url(self, obj):
         request = self.context['request']

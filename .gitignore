@@ -95,3 +95,11 @@ ENV/
 .ropeproject
 
 *.sqlite3
+
+# local env file
+*.env
+pwd
+
+# npm pkg
+frontend/semantic
+frontend/semantic.json

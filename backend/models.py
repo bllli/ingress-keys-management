@@ -3,13 +3,20 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
-class Area(models.Model):
-    """
-    Portal所处的物理区域标签 如天津/北京/华中
+class TagType(models.Model):
+    """标签类型"""
+    name = models.CharField(max_length=20)
+
+
+class Tag(models.Model):
+    """Portal所处的标签
+
+    如天津/北京/华中等物理区域 如成就/常驻蓝/战略/5分钟肉防
     """
     name = models.CharField(max_length=100)
 
-    up = models.ForeignKey('Area', null=True)
+    up = models.ForeignKey('Tag', null=True)
+    TagType = models.ForeignKey(TagType, null=True)
 
     class Meta:
         ordering = ('name',)
@@ -20,10 +27,9 @@ class Area(models.Model):
     def __repr__(self):
         return '<Area: %s>' % self.name
 
-    def add_portal(self, portal):
-        # ToDo: 没有解决修改标签关系后，Portal中含有冗余标签的问题
-        if self.up:  # 为某个po添加一个位置标签时，同时递归的添加父标签
-            self.up.add_portal(portal)
+    def add_portal(self, portal, recursive=False):
+        if recursive and self.up:  # 为某个po添加一个位置标签时，同时递归的添加父标签
+            self.up.add_portal(portal, recursive)
         self.portal_set.add(portal)
 
 
@@ -35,8 +41,8 @@ class Portal(models.Model):
     nickname = models.CharField(max_length=100, null=True)
     link = models.URLField()
 
-    # 所处区域 如一个po可同时添加 “华北”/“唐山”/“唐山市路北区”
-    areas = models.ManyToManyField(Area, related_name='portal_set')
+    # 标签集 如一个po可同时添加 “华北”/“唐山”/“唐山市路北区”
+    tags = models.ManyToManyField(Tag, related_name='portal_set')
     # 对于未授权用户来说，仅能查看自己手动添加link的portal
     adder = models.ManyToManyField(User, related_name='portal_added_set')
     author = models.ForeignKey(User, related_name='portal_created_set')
