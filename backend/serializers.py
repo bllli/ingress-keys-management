@@ -17,7 +17,7 @@ class TagTypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = TagType
-        fields = ()
+        fields = ('id', 'url', 'name')
 
     def get_url(self, obj):
         request = self.context['request']
@@ -28,9 +28,12 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
+    up = serializers.HyperlinkedRelatedField(view_name='tag-detail', read_only=True)
+    type = TagTypeSerializer()
+
     class Meta:
         model = Tag
-        fields = ('id', 'url', 'name')
+        fields = ('id', 'url', 'name', 'type', 'up')
 
     def get_url(self, obj):
         request = self.context['request']
@@ -41,8 +44,10 @@ class PortalSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
 
-    tags = serializers.HyperlinkedRelatedField(view_name='tag-detail',
-                                               many=True, queryset=Tag.objects.all())
+    # tags = serializers.HyperlinkedRelatedField(view_name='tag-detail',
+    #                                            many=True, queryset=Tag.objects.all())
+
+    tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Portal

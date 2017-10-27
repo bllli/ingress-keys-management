@@ -23,9 +23,10 @@ from backend import views
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'areas', views.AreaViewSet)
+router.register(r'tags', views.TagViewSet)
 router.register(r'portals', views.PortalViewSet)
 router.register(r'comments', views.CommentViewSet)
+router.register(r'tagtypes', views.TagTypeViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

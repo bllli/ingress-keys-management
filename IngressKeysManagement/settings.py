@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'backend',
 ]
 
-
 REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': (
     #     'rest_framework.permissions.IsAdminUser',
@@ -53,7 +52,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'backend.authentication.ExpiringTokenAuthentication',
     ),
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
 
 REST_FRAMEWORK_TOKEN_EXPIRE_MINUTES = 60

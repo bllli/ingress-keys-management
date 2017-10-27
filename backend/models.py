@@ -1,11 +1,17 @@
 from django.db import models
-from django.utils import timezone
+from django.utils import timezone, html
 from django.contrib.auth.models import User
 
 
 class TagType(models.Model):
     """标签类型"""
     name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<TagType: %s>' % self.name
 
 
 class Tag(models.Model):
@@ -15,8 +21,8 @@ class Tag(models.Model):
     """
     name = models.CharField(max_length=100)
 
-    up = models.ForeignKey('Tag', null=True)
-    TagType = models.ForeignKey(TagType, null=True)
+    up = models.ForeignKey('Tag', null=True, blank=True)
+    type = models.ForeignKey(TagType, null=True, blank=True)
 
     class Meta:
         ordering = ('name',)
@@ -25,7 +31,7 @@ class Tag(models.Model):
         return self.name
 
     def __repr__(self):
-        return '<Area: %s>' % self.name
+        return '<Tag: %s>' % self.name
 
     def add_portal(self, portal, recursive=False):
         if recursive and self.up:  # 为某个po添加一个位置标签时，同时递归的添加父标签
@@ -37,8 +43,14 @@ class Portal(models.Model):
     """
     Portal
     """
+    guid = models.CharField(max_length=30, null=True)
+    late6 = models.CharField(max_length=20, null=True)
+    lnge6 = models.CharField(max_length=20, null=True)
+    image = models.CharField(max_length=300, null=True)
+    timestamp = models.BigIntegerField(null=True)
+
     title = models.CharField(max_length=1000)
-    nickname = models.CharField(max_length=100, null=True)
+    nickname = models.CharField(max_length=100, null=True, blank=True)
     link = models.URLField()
 
     # 标签集 如一个po可同时添加 “华北”/“唐山”/“唐山市路北区”

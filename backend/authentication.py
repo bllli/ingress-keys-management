@@ -1,6 +1,7 @@
 import datetime
 from django.conf import settings
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import exceptions
 from django.utils.translation import ugettext_lazy as _
 
@@ -38,3 +39,9 @@ class ExpiringTokenAuthentication(TokenAuthentication):
             cache.set(key, token.user, EXPIRE_MINUTES * 60)
 
         return token.user, token
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return

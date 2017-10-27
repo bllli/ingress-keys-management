@@ -16,7 +16,8 @@ from rest_framework.views import APIView
 
 from backend import serializers
 from backend.permissions import IsOwnerOrReadOnly
-from backend.models import Tag, Portal, Comment, Key
+from backend.authentication import CsrfExemptSessionAuthentication
+from backend.models import Tag, Portal, Comment, TagType
 
 
 EXPIRE_MINUTES = getattr(settings, 'REST_FRAMEWORK_TOKEN_EXPIRE_MINUTES', 1)
@@ -91,6 +92,11 @@ class GroupViewSet(DefaultMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.GroupSerializer
 
 
+class TagTypeViewSet(DefaultMixin, viewsets.ModelViewSet):
+    queryset = TagType.objects.all()
+    serializer_class = serializers.TagTypeSerializer
+
+
 class PortalViewSet(DefaultMixin, viewsets.ModelViewSet):
     queryset = Portal.objects.all()
     serializer_class = serializers.PortalSerializer
@@ -99,7 +105,7 @@ class PortalViewSet(DefaultMixin, viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class AreaViewSet(DefaultMixin, viewsets.ModelViewSet):
+class TagViewSet(DefaultMixin, viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
@@ -113,13 +119,42 @@ class CommentViewSet(DefaultMixin, viewsets.ModelViewSet):
 
 
 class IITCView(APIView):
+    authentication_classes = (
+        authentication.BasicAuthentication,
+        authentication.TokenAuthentication,
+    )
+    # def get(self, request, *args, **kwargs):
+    #     print(self.request.user)
+    #     return Response({})
 
-    @csrf_exempt
-    def get(self, request, format=None):
-        print(self.request.user)
-        return Response({})
+    def post(self, request, *args, **kwargs):
+        def check_data(portal):
+            guid = portal['guid']
+            data = portal['data']
+            # 保留小数点后六位的坐标
+            latE6 = data['latE6']/1000000
+            lngE6 = data['lngE6']/1000000
+            image = data['image']
+            title = data['title']
+            timestamp = data['timestamp']
+            print(guid, latE6, lngE6, image, title, timestamp)
+            print('/intel?ll=%s,%s&z=17&pll=%s,%s' % (latE6, lngE6, latE6, lngE6))
 
-    @csrf_exempt
-    def post(self, request):
-        print(self.request.data)
-        return Response({})
+        try:
+            if request.query_params.get('type') == 'single':  # 单个据点上传
+                # print(self.request.user)
+                # print(self.request.data)
+                check_data(self.request.data)
+                response = Response({'status': 'ok'})
+
+            elif request.query_params.get('type') == 'many':
+                for po in self.request.data:
+                    check_data(po)
+                response = Response({'status': 'ok'})
+            else:
+                response = Response({'status': 'error', 'error': '你瞅啥？'})
+                response.status_code = 400
+        except KeyError:
+            response = Response({'status': 'error', 'info': '请通过tg/GitHub联系@bllli'})
+            response.status_code = 400
+        return response
