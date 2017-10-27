@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
 from rest_framework import routers
+from rest_framework.documentation import include_docs_urls
 
 from backend import views
 
@@ -34,6 +35,6 @@ urlpatterns = [
     url(r'^api/token/', views.ObtainExpiringAuthToken.as_view(), name='api-token'),
     url(r'^api/iitc/', views.IITCView.as_view()),
     url(r'^api/', include(router.urls)),
-    url(r'^docs/', include('rest_framework_docs.urls')),
+    url(r'^docs/', include_docs_urls(title='IKM API', public=False)),
     url(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ]

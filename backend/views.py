@@ -46,7 +46,10 @@ class IsOwnerOrReadOnlyMixin(DefaultMixin):
 
 
 class ObtainExpiringAuthToken(ObtainAuthToken):
-    """Create user token"""
+    """
+    Post：
+    提交用户账号密码，获取用户Token。
+    """
 
     @csrf_exempt
     def post(self, request, **kwargs):
@@ -68,6 +71,10 @@ class ObtainExpiringAuthToken(ObtainAuthToken):
 
 
 class UserViewSet(DefaultMixin, viewsets.ReadOnlyModelViewSet):
+    """
+    list:
+    获取用户列表  query: 携带`?query=myself`时查询自己信息
+    """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = serializers.UserSerializer
 
