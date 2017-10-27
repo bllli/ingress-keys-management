@@ -62,7 +62,7 @@ class Portal(models.Model):
     keys = models.ManyToManyField(User, through='Key', related_name='portal_key_set')
 
     class Meta:
-        ordering = ('title', 'link')
+        ordering = ('id', 'title', 'link')
 
     def __str__(self):
         return '%s @ %s' % (self.title, self.link)

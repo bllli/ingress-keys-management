@@ -3,7 +3,7 @@ import datetime
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
@@ -138,23 +138,45 @@ class IITCView(APIView):
             title = data['title']
             timestamp = data['timestamp']
             print(guid, latE6, lngE6, image, title, timestamp)
-            print('/intel?ll=%s,%s&z=17&pll=%s,%s' % (latE6, lngE6, latE6, lngE6))
+            url = 'https://ingress.com/intel?ll=%s,%s&z=17&pll=%s,%s' % (latE6, lngE6, latE6, lngE6)
+            guid_po = Portal.objects.filter(guid=guid).first()
+            link_po = Portal.objects.filter(link=url).first()
+            if not guid_po and not link_po:
+                Portal.objects.create(guid=guid, late6=latE6, lnge6=lngE6,
+                                      image=image, title=title, timestamp=timestamp,
+                                      link=url, author=self.request.user)
+            elif link_po or guid_po:
+                old_po = link_po or guid_po
+                old_po.link = url
+                old_po.guid = guid
+                old_po.late6 = latE6
+                old_po.lnge6 = lngE6
+                old_po.image = image
+                old_po.title = title
+                old_po.timestamp = timestamp
+                old_po.save()
+        if isinstance(self.request.user, AnonymousUser):
+            response = Response({'detail': '你谁啊？'})
+            response.status_code = 401
+            return response
 
         try:
             if request.query_params.get('type') == 'single':  # 单个据点上传
                 # print(self.request.user)
                 # print(self.request.data)
                 check_data(self.request.data)
-                response = Response({'status': 'ok'})
+                response = Response({'detail': 'ok'})
+                response.status_code = 201
 
             elif request.query_params.get('type') == 'many':
                 for po in self.request.data:
                     check_data(po)
-                response = Response({'status': 'ok'})
+                response = Response({'detail': 'ok'})
+                response.status_code = 201
             else:
-                response = Response({'status': 'error', 'error': '你瞅啥？'})
+                response = Response({'detail': '你瞅啥？'})
                 response.status_code = 400
         except KeyError:
-            response = Response({'status': 'error', 'info': '请通过tg/GitHub联系@bllli'})
+            response = Response({'detail': '请通过tg/GitHub联系@bllli'})
             response.status_code = 400
         return response
