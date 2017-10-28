@@ -43,7 +43,7 @@ class Portal(models.Model):
     """
     Portal
     """
-    guid = models.CharField(max_length=30, null=True)
+    guid = models.CharField(max_length=40, null=True)
     late6 = models.CharField(max_length=20, null=True)
     lnge6 = models.CharField(max_length=20, null=True)
     image = models.CharField(max_length=300, null=True)
@@ -56,7 +56,7 @@ class Portal(models.Model):
     # 标签集 如一个po可同时添加 “华北”/“唐山”/“唐山市路北区”
     tags = models.ManyToManyField(Tag, related_name='portal_set')
     # 对于未授权用户来说，仅能查看自己手动添加link的portal
-    adder = models.ManyToManyField(User, related_name='portal_added_set')
+    adder = models.ManyToManyField(User, related_name='portal_added_set', blank=True)
     author = models.ForeignKey(User, related_name='portal_created_set')
 
     keys = models.ManyToManyField(User, through='Key', related_name='portal_key_set')

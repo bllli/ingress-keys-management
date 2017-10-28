@@ -111,6 +111,29 @@ class PortalViewSet(DefaultMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def list(self, request, *args, **kwargs):
+        params = request.query_params
+        if params.get('query') == 'myself':  # 查询自己的po
+            self.queryset = Portal.objects.filter(author=request.user).all()
+        elif params.get('query') == 'has_key':  # 自己拥有key的Po
+            request.user: User
+            self.queryset = Portal.objects.filter(key__holder=request.user).all()  # request.user.key_set.all()
+        return super(PortalViewSet, self).list(request, args, kwargs)
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        mykey = request.data.get('mykey')
+        po_id = request.data.get('id')
+        po = Portal.objects.get(pk=po_id)
+        print(po)
+        key_log = request.user.key_set.filter(portal__author=request.user, portal=po).first()
+        if key_log:
+            key_log.number = mykey
+            key_log.save()
+        else:
+            request.user.key_set.create(number=mykey, portal=po)
+        return super(PortalViewSet, self).update(request, args, kwargs)
+
 
 class TagViewSet(DefaultMixin, viewsets.ModelViewSet):
     queryset = Tag.objects.all()

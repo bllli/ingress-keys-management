@@ -43,6 +43,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
 class PortalSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     url = serializers.SerializerMethodField()
+    mykey = serializers.SerializerMethodField()
 
     # tags = serializers.HyperlinkedRelatedField(view_name='tag-detail',
     #                                            many=True, queryset=Tag.objects.all())
@@ -51,11 +52,17 @@ class PortalSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Portal
-        fields = ('id', 'url', 'title', 'link', 'nickname', 'tags')
+        fields = ('id', 'url', 'title', 'link', 'nickname', 'tags', 'mykey', 'image')
 
     def get_url(self, obj):
         request = self.context['request']
         return reverse('portal-detail', kwargs={'pk': obj.pk}, request=request)
+
+    def get_mykey(self, obj):
+        request = self.context['request']
+        request.user: User
+        key = request.user.key_set.filter(portal=obj).first()
+        return 0 if not key else key.number
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):

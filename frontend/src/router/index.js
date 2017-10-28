@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import hello from '../components/HelloWorld.vue'
 import User from '../views/User.vue'
 import Login from '../views/Login.vue'
+import PortalSet from '../components/PortalSet.vue'
 import store from '../store/store'
 import * as types from '../store/types'
 
@@ -20,7 +21,19 @@ const routes = [
     meta: {
       requireAuth: true
     },
-    component: User
+    component: User,
+    children: [
+      {
+        path: 'upload_portals',
+        component: PortalSet,
+        props: { type: 'user_uploaded' }
+      },
+      {
+        path: 'own_key_portals',
+        component: PortalSet,
+        props: { type: 'has_key' }
+      }
+    ]
   },
   {
     path: '/login',
