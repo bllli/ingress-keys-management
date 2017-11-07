@@ -45,6 +45,10 @@ function wrapper(plugin_info) {
     window.plugin.ikm.neuP = 0;
     window.plugin.ikm.filter = 0;
 
+    window.plugin.ikm.base_url = 'https://api.bllli.cn/';
+    window.plugin.ikm.username = 'your username';
+    window.plugin.ikm.password = 'your password';
+
     /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
  * title: String
@@ -383,10 +387,14 @@ function wrapper(plugin_info) {
         });
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8000/api/iitc/?type=many',
+            url: window.plugin.ikm.base_url + 'api/iitc/?type=many',
             dataType: "json",
             contentType:"application/json; charset=utf-8",
             data: JSON.stringify(po_list),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic " +
+                    btoa(window.plugin.ikm.username + ":" + window.plugin.ikm.password));
+            },
             success: function(){
                 console.log("success");
             },
@@ -404,9 +412,13 @@ function wrapper(plugin_info) {
         // console.log(portals[selectedPortal].options);
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8000/api/iitc/?type=single',
+            url: window.plugin.ikm.base_url + 'api/iitc/?type=single',
             dataType: "json",
             contentType:"application/json; charset=utf-8",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic " +
+                    btoa(window.plugin.ikm.username + ":" + window.plugin.ikm.password));
+            },
             data: JSON.stringify(portals[selectedPortal].options),
             success: function(){
                 console.log("success");
