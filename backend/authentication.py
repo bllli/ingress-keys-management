@@ -1,5 +1,6 @@
 import datetime
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import exceptions
@@ -28,7 +29,7 @@ class ExpiringTokenAuthentication(TokenAuthentication):
         if not token.user.is_active:
             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
 
-        time_now = datetime.datetime.now()
+        time_now = timezone.now()
 
         if token.created < time_now - datetime.timedelta(minutes=EXPIRE_MINUTES):
             token.delete()

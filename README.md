@@ -22,7 +22,7 @@ Django + Vue.js
 #### 准备
 安装好
 - Python3.6(个人推荐使用Anaconda3, 很方便)
-- npm
+- npm >= 5.3.0
 #### 前端
 ```shell
 cd frontend
