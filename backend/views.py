@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from backend import serializers
 from backend.permissions import IsOwnerOrReadOnly
 from backend.authentication import CsrfExemptSessionAuthentication
+from backend.authentication import ExpiringTokenAuthentication
 from backend.models import Tag, Portal, Comment, TagType
 
 
@@ -25,9 +26,9 @@ EXPIRE_MINUTES = getattr(settings, 'REST_FRAMEWORK_TOKEN_EXPIRE_MINUTES', 1)
 
 class DefaultMixin(object):
     authentication_classes = (
-        authentication.SessionAuthentication,
-        authentication.BasicAuthentication,
-        authentication.TokenAuthentication
+        # authentication.SessionAuthentication,
+        # authentication.BasicAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     permission_classes = (

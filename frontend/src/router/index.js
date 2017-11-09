@@ -26,7 +26,7 @@ const routes = [
       {
         path: 'upload_portals',
         component: PortalSet,
-        props: { type: 'user_uploaded' }
+        props: { type: 'myself' }
       },
       {
         path: 'own_key_portals',
